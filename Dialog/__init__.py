@@ -1,0 +1,1 @@
+from dialogs import UIAbout,UIProject,UIRename,UIOptions

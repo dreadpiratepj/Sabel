@@ -24,6 +24,7 @@ class Tree(QTreeWidget):
         self.setAcceptDrops(True)
         self.setColumnCount(1)
         self.projects = 0
+        self.header().close()
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self,SIGNAL("customContextMenuRequested(const QPoint &)"), self.doMenu)
         self.connect(self, SIGNAL("dropped"), self.addItem)

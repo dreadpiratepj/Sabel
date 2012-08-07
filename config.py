@@ -37,17 +37,22 @@ class Config:
         for i in data:
             if(i == nfile):
                 return False
-        return True 
+        return True
         
-                 
+                       
     def addFile(self,nfile):
         files = self.files()
         if(self.check(files,nfile)):
-            files.append(nfile)
-            try:
-                yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
-            except:
-                print "cannot open config file"
+            if(os.path.exists(nfile)):
+                files.append(nfile)
+                try:
+                    yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
+                except:
+                    print "cannot open config file"
+            else:
+                print "File Does not Exist"
+        else:
+            print "File is Already Saved"
                 
     def removeFile(self,nfile):
         files = self.files()
@@ -75,7 +80,3 @@ class Config:
                 yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
             except:
                 print "cannot open config file"
-                
-if __name__ == '__main__':
-    config = Config()
-    config.addFile("C:/CO")

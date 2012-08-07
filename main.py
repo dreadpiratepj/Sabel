@@ -1,18 +1,20 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.3"
+__version__ = "0.31"
 __copyright__ = 'Copyright 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
 
-import sys
+#TODO:
+#Need to add options for all GUI
+
 import os
 import platform
 
-
-from PyQt4.QtGui import *
-from PyQt4.QtCore import SIGNAL,Qt,QProcess,QThread,QString,QT_VERSION_STR,PYQT_VERSION_STR
+from PyQt4.QtGui import (QMainWindow,QApplication,QPixmap,QSplashScreen,
+                         QIcon,QAction,QMenu,QMessageBox)
+from PyQt4.QtCore import SIGNAL,Qt,QProcess,QString,QT_VERSION_STR,PYQT_VERSION_STR
 
 from ui_simple import Ui_MainWindow
 import icons_rc
@@ -22,7 +24,8 @@ from Dialog import *
 from config import Config
 from styles import *
 import threading
-import platform
+
+from ipython import PyInterp
 
 
 config = Config()
@@ -33,57 +36,55 @@ iconSize = config.iconSize()
 workDir = os.getcwd()
 iconDir = os.path.join(workDir,"Icons")
 
-           
-#TODO:
-#Need to add options for all GUI
-#Need to check filename != none in createTab
+
 class myThread (threading.Thread):
-    def __init__(self, proc, name = None, counter = None):
-        self.proc = proc
-        self.name = name
-        self.counter = counter
+    def __init__(self, proc):
         threading.Thread.__init__(self)
+        self.proc = proc
+        
     def run(self):
         self.proc()
-        print "Starting " + self.name
-        print "Exiting " + self.name
+        print "Starting "
+        print "Exiting "
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.setupUi(self)
-      #  self.resize(800, 600) 
-        #self.setWindowFlags(Qt.FramelessWindowHint)     
+        self.setupUi(self)   
         self.isRunning = False
         self.isFull = False
         self.isCmd = False
+        self.CmdThread = None
         self.process = QProcess(self)
-        #self.CmdThread = myThread(self.run())
         self.cmdText = ""
-        self.connect(self, SIGNAL('triggered()'), self.closeEvent)
-        
         self.setWindowTitle("Sabel")
         self.setWindowIcon(self.os_icon("eclipse"))
-        
+        self.init()
+          
+    def init(self):
+        #self.initOS()
         self.initConfig()
         self.initToolBar()
         self.initCommand()
-        for i in self.projects:      
-            self.createProjects(i)
         self.initTree()
+        self.initProjects()
+        self.initStyles()
+        self.connect(self, SIGNAL('triggered()'), self.closeEvent)
         self.connect(self.tabWidget,SIGNAL("dropped"), self.createTab)
-        #self.ipy = PyInterp(self)
-        #self.ipy.initInterpreter(locals()) 
-        #self.tabWidget_2.addTab(self.ipy, "Python")
-        #self.initSytles()
+       
+        #self.initInterpreter()
         #print self.files.pop()
-        print platform.system()
-        print os.name    
-        print os.path.join("C:",os.sep,"Code")
         
+        
+    def initOS(self):
+        print platform.system() 
+        #print os.name    
+        #print os.path.join("C:",os.sep,"Code")   
+            
     def initConfig(self):
         self.tabWidget.setTabsClosable(True)
-        self.files = [""]
+        #Important must be empty
+        self.files = [] 
         self.projects = config.projects()
         self.recent = config.recent()
         self.dirty = []
@@ -91,10 +92,37 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setCurrentIndex(len(self.files)-1)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.tabWidget.setTabShape(1)
+        
+    def initTree(self):
+        self.treeWidget.itemDoubleClicked.connect(self.ss)
+        
+    def initProjects(self):
+        if self.projects != None:
+            for i in self.projects:      
+                self.createProjects(i)
+        
+     
+    def createProjects(self,startDir):
+        self.treeWidget.addProject(startDir)
+        
+    def ss(self,item):
+        self.createTab(item.getPath())
+        
+    def initStyles(self):
+        self.tabWidget.setStyleSheet(stl)
+        #self.statusBar().setStyleSheet(statl)
+        #self.textEdit.setStyleSheet(scl) 
+        #self.toolbar.setStyleSheet(ttl)     
    
     def initCommand(self):
         self.connect(self.process, SIGNAL("readyReadStandardOutput()"), self.readOutput)
         self.connect(self.process, SIGNAL("readyReadStandardError()"), self.readErrors)
+        
+    def initInterpreter(self):
+        self.ipy = PyInterp(self)
+        self.ipy.initInterpreter(locals()) 
+        self.tabWidget_2.addTab(self.ipy, "Python")
+        
         
     def initToolBar(self):
         self.action_NewProject = QAction(self.os_icon('newprj_wiz'), 'Project', self)
@@ -182,29 +210,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolbar.addAction(self.action_About)
         self.toolbar.addAction(self.action_Full)
         
-    def createProjects(self,startDir):
-        self.treeWidget.addProject(startDir)
-        
-    def initTree(self):
-        self.treeWidget.itemDoubleClicked.connect(self.ss)
-        
-    def ss(self,item):
-        self.createTab(item.getPath())
-        #print item.getPath()
-        
-    def initStyles(self):
-        self.tabWidget.setStyleSheet(stl)
-        #self.dockWidget.setStyleSheet(dtl)
-        self.statusBar().setStyleSheet(statl)
-        self.textEdit.setStyleSheet(scl) 
-        self.toolbar.setStyleSheet(ttl)     
             
     def createTab(self,nfile):
-        for i in self.files:
-            if(i == nfile):
-                QMessageBox.about(self,"Can't Open","File Already Open")
-                return      
-        if type(nfile) == str:
+        if(nfile != None):
+            if len(self.files) != 0:
+                for i in self.files:
+                    if(i == nfile):
+                        QMessageBox.about(self,"Can't Open","File Already Open")
+                        return  
+            if type(nfile) == str:
                 config.addFile(nfile)
                 self.files.append(nfile)
                 self.dirty.append(False)
@@ -217,9 +231,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     tab.textChanged.connect(lambda:self.setDirty(nfile)) 
                 except:
                     QMessageBox.about(self,"Can't Open","File Does Not Exist")                 
-        else:
-            for i in nfile:
-                self.createTab(i) 
+            else:
+                for i in nfile:
+                    self.createTab(i) 
                      
                      
         
@@ -261,7 +275,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def about(self):
         QMessageBox.about(self, "About IDE",
                 """
-                <b>IDE</b> v%s
+                <b>Sabel</b> v%s
                 <p>
                 All rights reserved in accordance with
                 GPL v3 or later.
@@ -317,7 +331,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def fileOpen(self):
         '''Open file'''
-        fname = unicode(QFileDialog.getOpenFileName(self,
+        fname = str(QFileDialog.getOpenFileName(self,
                         "Open File", '.', "Files (*.*)"))
         if not (fname == ""):
             for file in self.files:
@@ -329,7 +343,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     QMessageBox.about(self, "Already Open","File Already Open")
                     return
         else:
-            QMessageBox.about(self, "No File","No File Selected")
             return
         
     def fileSave(self):
@@ -391,7 +404,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
      
      
     def runn(self):
-        self.CmdThread.start()
+        self.CmdThread = myThread(self.run())
+        #self.CmdThread.start()
            
     def run(self):
         if self.isRunning == False:
@@ -404,7 +418,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.textEdit.clear()
             self.tabWidget_2.setCurrentIndex(1)
             self.textEdit.append("Pushing main.nut\n")          
-            self.process.start("adb -d push C:\\CODE\\main.nut /sdcard/")
+            self.process.start("adb -d push C:/CODE/main.nut /sdcard/")
             self.process.waitForFinished()
             self.process.kill()
             self.textEdit.append("Starting Activity\n")

@@ -8,20 +8,20 @@ QTabWidget::tab-bar {
  */
 QTabBar::tab {
     min-width: 15px;
-    max-width: 240px;
-    padding: 4px 16px;
-    font-size: .85em;
+    max-width: 800px;
+    padding: 2px 12px;
+    font-size: .75em;
 }
 
 QTabBar::tab:!selected {
-    margin-top: 3px; /* make non-selected tabs look smaller */
+    margin-top: 1px; /* make non-selected tabs look smaller */
 }
 
 /* make use of negative margins for overlapping tabs */
 QTabBar::tab:selected {
     /* expand/overlap to the left and right by 4px */
-    margin-left: -2px;
-    margin-right: -2px;
+   /* margin-left: -1px; */
+   /* margin-right: -1px;*/
 }
 
 QTabBar::tab:first:selected {

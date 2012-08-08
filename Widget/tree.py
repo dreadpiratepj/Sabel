@@ -1,8 +1,7 @@
-import os
-from PyQt4.QtGui import *
-from PyQt4.QtCore import *
-from PyQt4.Qsci import *
-from Dialog import *
+from PyQt4.QtGui import (QTreeWidgetItem,QTreeWidget,QMessageBox,
+                         QIcon,QDrag,QMenu,QAction,QInputDialog,QCursor)
+from PyQt4.QtCore import SIGNAL,Qt,QMimeData
+from globals import oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,ospathbasename
 
 class Item(QTreeWidgetItem):
     def __init__(self,parent):
@@ -13,7 +12,7 @@ class Item(QTreeWidgetItem):
         self.path.append(path)
     
     def getPath(self):
-        return os.path.join(self.path)
+        return ospathjoin(self.path)
         
         
         
@@ -30,32 +29,32 @@ class Tree(QTreeWidget):
         self.connect(self, SIGNAL("dropped"), self.addItem)
          
     def readDir(self,parent,path):
-        for d in os.listdir(path):
-            if  os.path.isdir(os.path.join(path+d)) is True:
-                if not os.path.join(d).startswith('.'):
+        for d in oslistdir(path):
+            if  ospathisdir(ospathjoin(path+d)) is True:
+                if not ospathjoin(d).startswith('.'):
                     i = Item(parent) # create QTreeWidget the sub i
                     i.setText (0, d) # set the text of the first 0
-                    i.setIcon(0,self.os_icon("alert_obj"))
+                    i.setIcon(0,self.os_icon("fldr_obj"))
                     i.addPath(path+d)
                     self.readFiles(path+d,i) 
         self.readFiles(path,parent)           
             
     def readFiles(self,path,i):
-        for f in os.listdir(path):
-            if  os.path.isdir(os.path.join(path+f)) is False:
-                if not os.path.join(f).startswith('.'):
+        for f in oslistdir(path):
+            if  ospathisdir(ospathjoin(path+f)) is False:
+                if not ospathjoin(f).startswith('.'):
                     j = Item(i)
                     j.setText (0,f)
                     j.setIcon(0,self.os_icon("alert_obj"))
                     j.addPath(path+f)
                 
     def addProject(self,startDir):
-        if(os.path.exists(startDir)):    
+        if(ospathexists(startDir)):    
             #self.treeWidget.setDragDropMode(QAbstractItemView.InternalMove)
             i = Item(self) # create QTreeWidget the sub i
             i.setText (0, startDir) # set the text of the first 0
             i.setToolTip(0,startDir)
-            i.setIcon(0,self.os_icon('alert_obj'))
+            i.setIcon(0,self.os_icon('prj_obj'))
             i.addPath(startDir)
             self.addTopLevelItem(i)
             self.readDir(i,startDir)
@@ -68,7 +67,7 @@ class Tree(QTreeWidget):
      
         
     def os_icon(self,name):
-        return QIcon(":/{0}.gif".format("Icons"+os.path.sep+name))
+        return QIcon(":/{0}.gif".format("Icons"+ospathsep+name))
     
     def addItem(self,links):
         print links
@@ -104,7 +103,7 @@ class Tree(QTreeWidget):
             for url in event.mimeData().urls():
                 links.append(str(url.toLocalFile()))
                 item = Item(self)
-                item.setText(0, os.path.basename(str(url.toLocalFile())))
+                item.setText(0, ospathbasename(str(url.toLocalFile())))
                 self.addTopLevelItem(item)
             self.emit(SIGNAL("dropped"), links)      
         else:
@@ -120,10 +119,23 @@ class Tree(QTreeWidget):
         #name = item.getPath()
 
         menu = QMenu(self)
+        action_Folder = QAction(self.os_icon('newfolder_wiz'),'New Folder', self)
+        action_Folder.triggered.connect(lambda:self.newFolder(item))
+        action_addFolder = QAction(self.os_icon('importdir_wiz'),'Add Folder', self)
+        action_addFolder.triggered.connect(lambda:self.addFolder(item))
+        action_File = QAction(self.os_icon('new_untitled_text_file'),'New File', self)
+        action_File.triggered.connect(lambda:self.newFile(item))
+        action_addFile = QAction(self.os_icon('impc_obj'),'Add File', self)
+        action_addFile.triggered.connect(lambda:self.addFile(item))
         action_Rename = QAction('Rename', self)
         action_Rename.triggered.connect(lambda:self.rename(item))
-        action_Delete = QAction('Delete', self)
+        action_Delete = QAction(self.os_icon('trash'),'Delete', self)
         action_Delete.triggered.connect(lambda:self.delete(item))
+        menu.addAction(action_Folder)
+        menu.addAction(action_addFolder)
+        menu.addAction(action_File)
+        menu.addAction(action_addFile)
+        menu.addSeparator()
         menu.addAction(action_Rename)
         menu.addAction(action_Delete)
         menu.popup(QCursor.pos())
@@ -131,6 +143,16 @@ class Tree(QTreeWidget):
     def closeProject(self,item):
         print item.parent()
         
+        
+    def newFolder(self,item):
+        pass
+    def addFolder(self,item):
+        pass
+    def newFile(self,item):
+        pass
+    def addFile(self,item):
+        pass
+    
     def rename(self,item):
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
         if (ok and text != ''):

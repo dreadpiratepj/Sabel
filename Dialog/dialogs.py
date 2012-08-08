@@ -1,30 +1,14 @@
 from PyQt4.QtGui import *
-import os
-
-
-class UIAbout(QDialog):
-    """About dialogue
-    """
-    def __init__(self, parentWindow):
-        QDialog.__init__(self, parentWindow)
-        from PyQt4 import uic  # lazy import for better startup performance
-        uic.loadUi(os.path.join(os.path.dirname(__file__), 'About.ui'), self)
-        
+from globals import ospathdirname,ospathjoin
+      
 class UIProject(QDialog):
     """Project dialogue
     """
     def __init__(self, parentWindow):
         QDialog.__init__(self, parentWindow)
         from PyQt4 import uic  # lazy import for better startup performance
-        uic.loadUi(os.path.join(os.path.dirname(__file__), 'Project.ui'), self)
+        uic.loadUi(ospathjoin(ospathdirname(__file__), 'Project.ui'), self)
         
-class UIRename(QDialog):
-    """Project dialogue
-    """
-    def __init__(self, parentWindow):
-        QDialog.__init__(self, parentWindow)
-        from PyQt4 import uic  # lazy import for better startup performance
-        uic.loadUi(os.path.join(os.path.dirname(__file__), 'Rename.ui'), self)
         
 class UIOptions(QDialog):
     """Project dialogue
@@ -32,7 +16,7 @@ class UIOptions(QDialog):
     def __init__(self, parentWindow):
         QDialog.__init__(self, parentWindow)
         from PyQt4 import uic  # lazy import for better startup performance
-        uic.loadUi(os.path.join(os.path.dirname(__file__), 'Options.ui'), self)
+        uic.loadUi(ospathjoin(ospathdirname(__file__), 'Options.ui'), self)
         #self.tabWidget.
         #fname = unicode(QFileDialog.getExistingDirectory(self,
         #                "Open File", '.', "Files (*.*)"))
@@ -49,7 +33,7 @@ class MainForm(QMainWindow):
         qtt.textChanged.connect(self.dd)
         
     def dd(self):
-        main = UIAbout(self)
+        main = UIOptions(self)
         main.show()
         
 def main():

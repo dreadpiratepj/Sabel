@@ -52,7 +52,8 @@ class Config:
             else:
                 print "File Does not Exist"
         else:
-            print "File is Already Saved"
+            #print "File is Already Saved" #need to fix this
+            pass
                 
     def removeFile(self,nfile):
         files = self.files()

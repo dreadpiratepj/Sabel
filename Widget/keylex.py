@@ -1,6 +1,6 @@
 
 import sys
-from PyQt4.QtCore import SIGNAL, SLOT, QString
+from PyQt4.QtCore import SIGNAL, SLOT, QString,QStringList
 from PyQt4.QtGui import QApplication, QMainWindow, QColor, QFont
 from PyQt4.Qsci import QsciScintilla, QsciLexerCustom
 
@@ -167,6 +167,9 @@ class ConfigLexer(QsciLexerCustom):
             }
         for key,value in self._styles.iteritems():
             setattr(self, value, key)
+            
+        self.lis = QStringList()
+        self.lis<<"class" << "function"
         self.words1 = ['class','int', 'str', 'local', 'const', 'function', 'return', 'break']
         """
         'int', 'str', 'local', 'const', 'function', 'return', 'break',
@@ -258,12 +261,20 @@ class ConfigLexer(QsciLexerCustom):
             return True
         return QsciLexerCustom.defaultEolFill(self, style)
     
-    def gett(self,x):
-        for i in self.words1:
-            if x.startswith(i):
-                return self.KeyWord1
-            else:
-                return self.Default
+    def paintKeywords(self,source,start):
+        for word in self.lis:
+            word = QString(word)
+            if(source.contains(word)):
+                p = source.count(word)
+                index = 0
+                while (p != 0):
+                    begin = source.indexOf(word,index)
+                    index = begin +1
+                    self.startStyling (start + begin)
+                    self.setStyling (len(word), self.Green)
+                    self.startStyling (start + begin)
+                    p-=1
+
         
     def styleText(self, start, end):
         editor = self.editor()
@@ -277,15 +288,18 @@ class ConfigLexer(QsciLexerCustom):
         if end > editor.length():
             end = editor.length()
         if end > start:
-            source = bytearray(end - start)
+            data = bytearray(end - start + 1)
+            source = QString(data)
             SCI(QsciScintilla.SCI_GETTEXTRANGE, start, end, source)
         if not source:
             return
+        self.paintKeywords(source, start)
+        #self.startStyling(start, 0x1f)
 
-        self.startStyling(start, 0x1f)
+        #index = SCI(QsciScintilla.SCI_LINEFROMPOSITION, start)
+        
 
-        index = SCI(QsciScintilla.SCI_LINEFROMPOSITION, start)
-
+        """
         for line in source.splitlines(True):
 # Try to uncomment the following line to see in the console
 # how Scintiallla works. You have to think in terms of isolated
@@ -313,7 +327,7 @@ class ConfigLexer(QsciLexerCustom):
                         newState = self.gett(line[i:])
                         wordLength = 5
                         
-                        """
+                        
                         if line[i:].startswith("class"):
                                 newState = self.KeyWord2
                                 wordLength = len('class')
@@ -325,7 +339,7 @@ class ConfigLexer(QsciLexerCustom):
                                 wordLength = len('null')
                         else:
                                     newState = self.Default
-                        """        
+                                
 
                     i += wordLength
                     set_style(wordLength, newState)
@@ -335,6 +349,7 @@ class ConfigLexer(QsciLexerCustom):
                 set_style(length, newState)
 
             index += 1
+        """
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

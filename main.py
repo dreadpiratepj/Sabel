@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.33"
-__copyright__ = 'Copyright 2012, pyros2097'
+__version__ = "0.35"
+__copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
 
@@ -13,7 +13,7 @@ import platform
 
 from PyQt4.QtGui import (QMainWindow,QApplication,QPixmap,QSplashScreen,
                          QIcon,QAction,QMenu,QMessageBox)
-from PyQt4.QtCore import SIGNAL,Qt,QProcess,QString,QT_VERSION_STR,PYQT_VERSION_STR
+from PyQt4.QtCore import SIGNAL,Qt,QProcess,QStringList,QString,QT_VERSION_STR,PYQT_VERSION_STR
 
 from ui_simple import Ui_MainWindow
 import icons_rc
@@ -92,7 +92,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.recent = config.recent()
         self.dirty = []
         self.createTab(config.files())
-        self.tabWidget.setCurrentIndex(len(self.files)-1)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.tabWidget.setTabShape(1)
         
@@ -170,7 +169,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_Run.setShortcut('Ctrl+R')
         self.action_Run.triggered.connect(self.runn)
         self.action_RunFile = QAction(os_icon('start_ccs_task'), 'File', self)
-        self.action_RunFile.triggered.connect(self.runn)
+        self.action_RunFile.triggered.connect(self.runFile)
         self.action_Stop = QAction(os_icon('term_sbook'), 'Stop', self)
         self.action_Stop.setShortcut('Ctrl+Q')
         self.action_Stop.triggered.connect(self.stop)
@@ -273,7 +272,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     QMessageBox.about(self,"Can't Open","File Does Not Exist")                 
             else:
                 for i in nfile:
-                    self.createTab(i) 
+                    self.createTab(i)
+            #This line sets the opened file to display Important not checked
+            self.tabWidget.setCurrentIndex(len(self.files)-1)
                      
                      
         
@@ -448,20 +449,35 @@ class MainWindow(QMainWindow, Ui_MainWindow):
      
      
     def runn(self):
-        #Running: C:/CODE/Tools/icons.py (Wed Aug 08 17:15:55 2012)
         self.CmdThread = myThread(self.run())
         #self.CmdThread.start()
+        
+    def runFile(self):
+        nfile = self.files[self.tabWidget.currentIndex()]
+        if self.isRunning == False:
+            if self.process.isOpen():
+                self.process.kill()
+            self.isRunning = True
+            self.action_RunFile.setDisabled(True)
+            self.action_Stop.setEnabled(True)
+            self.textEdit.clear()
+            self.tabWidget_2.setCurrentIndex(1)
+            self.textEdit.append("Running")   
+            #self.process.start("sq "+"sqtest.nut")
+            #self.process.waitForFinished(msecs=5000)
+            self.process.kill()
            
     def run(self):
         if self.isRunning == False:
             if self.process.isOpen():
                 self.process.kill()
             self.isRunning = True
-            self.action_Run.setIcon(os_icon('run_exc'))
+            #self.action_Run.setIcon(os_icon('run_exc'))
             self.action_Run.setDisabled(True)
             self.action_Stop.setEnabled(True)
             self.textEdit.clear()
             self.tabWidget_2.setCurrentIndex(1)
+            #Running: C:/CODE/Tools/icons.py (Wed Aug 08 17:15:55 2012)
             self.textEdit.append("Pushing main.nut\n")          
             self.process.start("adb -d push C:/CODE/main.nut /sdcard/")
             self.process.waitForFinished()
@@ -483,7 +499,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.process.waitForFinished()
             self.process.kill()
             self.tabWidget_2.setCurrentIndex(0)
-            self.action_Run.setIcon(os_icon('lrun_obj'))
+            #self.action_Run.setIcon(os_icon('lrun_obj'))
             self.action_Run.setEnabled(True)
             
     def readOutput(self):

@@ -1,25 +1,50 @@
 from PyQt4.QtGui import (QTreeWidgetItem,QTreeWidget,QMessageBox,
                          QIcon,QDrag,QMenu,QAction,QInputDialog,QCursor)
 from PyQt4.QtCore import SIGNAL,Qt,QMimeData
-from globals import oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,ospathbasename
+from globals import (oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,
+                     ospathbasename,os_icon,osremove,osrename,ospathdirname,
+                     recycle)
 
 class File(QTreeWidgetItem):
-    def __init__(self,parent):
+    def __init__(self,parent,name,path,isDir = False):
         QTreeWidgetItem.__init__(self,parent)
         self.path = []
+        self.setText (0, name)
+        self.dir = isDir
+        if(self.dir):
+            self.setIcon(0,os_icon("package_obj"))#fldr_obj
+        else:
+            if(name.endswith(".txt")):
+                self.setIcon(0,os_icon("file_obj"))
+            elif(name.endswith(".nut")):
+                self.setIcon(0,os_icon("file_obj"))
+            elif(name.endswith(".py")):
+                self.setIcon(0,os_icon("file_obj"))
+            elif(name.endswith(".c")):
+                self.setIcon(0,os_icon("file_obj"))
+        self.addPath(path+name)
         
     def addPath(self,path):
         self.path.append(path)
     
     def getPath(self):
         return ospathjoin(self.path)
+    
+    def isDir(self):
+        return self.dir
+    def isProject(self):
+        return False
         
 class Project(QTreeWidgetItem):
     Count = 0
-    def __init__(self,parent,startDir):
+    def __init__(self,parent,startDir,closed = False):
         QTreeWidgetItem.__init__(self,parent)
         self.path = []
-        self.setIcon(0,self.os_icon('prj_obj'))
+        self.closed = closed
+        if(self.closed):
+            self.setIcon(0,os_icon('cprj_obj'))
+        else:
+            self.setIcon(0,os_icon('prj_obj'))
         self.addPath(startDir)
         self.setText (0, startDir) # set the text of the first 0
         self.setToolTip(0,startDir)
@@ -31,8 +56,12 @@ class Project(QTreeWidgetItem):
     def getPath(self):
         return ospathjoin(self.path)
     
-    def os_icon(self,name):
-        return QIcon(":/{0}.gif".format("Icons"+ospathsep+name))
+    def isDir(self):
+        return False
+    def isProject(self):
+        return True
+    def isClosed(self):
+        return self.closed
         
 class Tree(QTreeWidget):
     def __init__(self,parent = None):
@@ -44,43 +73,42 @@ class Tree(QTreeWidget):
         self.setContextMenuPolicy(Qt.CustomContextMenu)
         self.connect(self,SIGNAL("customContextMenuRequested(const QPoint &)"), self.doMenu)
         self.connect(self, SIGNAL("dropped"), self.addItem)
+        self.projects = []
+        self.closed = []
          
     def readDir(self,parent,path):
         for d in oslistdir(path):
             if  ospathisdir(ospathjoin(path+d)) is True:
                 if not ospathjoin(d).startswith('.'):
-                    i = File(parent) # create QTreeWidget the sub i
-                    i.setText (0, d) # set the text of the first 0
-                    i.setIcon(0,self.os_icon("fldr_obj"))
-                    i.addPath(path+d)
+                    i = File(parent,d,path,True) # create QTreeWidget the sub i
                     self.readFiles(path+d,i) 
-        self.readFiles(path,parent)           
+        self.readFiles(path,parent)
+                 
             
     def readFiles(self,path,i):
         for f in oslistdir(path):
             if  ospathisdir(ospathjoin(path+f)) is False:
                 if not ospathjoin(f).startswith('.'):
-                    j = File(i)
-                    j.setText (0,f)
-                    j.setIcon(0,self.os_icon("alert_obj"))
-                    j.addPath(path+f)
+                    File(i,f,path)
                 
     def addProject(self,startDir):
-        if(ospathexists(startDir)):    
-            #self.treeWidget.setDragDropMode(QAbstractItemView.InternalMove)
-            i = Project(self,startDir) # create QTreeWidget the sub i
+        if(ospathexists(startDir)): 
+            self.projects.append(startDir)
+            self.closed.append(False)
+            i = Project(self,startDir)
             self.addTopLevelItem(i)
             self.readDir(i,startDir)
         else:
             QMessageBox.about(self,"Can't Open Project","Project Does Not Exist %s"%startDir)
-        
-    def removeProject(self,startDir):
-        self.clear()
-     
-        
-    def os_icon(self,name):
-        return QIcon(":/{0}.gif".format("Icons"+ospathsep+name))
-    
+            
+    def addClosedProject(self,startDir):
+        if(ospathexists(startDir)):
+            self.closed[self.projects.index(startDir)] = True
+            i = Project(self,startDir,True) 
+            self.addTopLevelItem(i)
+        else:
+            QMessageBox.about(self,"Can't Open Project","Project Does Not Exist %s"%startDir)
+      
     def addItem(self,links):
         print links
                 
@@ -114,9 +142,9 @@ class Tree(QTreeWidget):
             links = []
             for url in event.mimeData().urls():
                 links.append(str(url.toLocalFile()))
-                item = Item(self)
-                item.setText(0, ospathbasename(str(url.toLocalFile())))
-                self.addTopLevelItem(item)
+                #item = File(self)
+                #item.setText(0, ospathbasename(str(url.toLocalFile())))
+                #self.addTopLevelItem(item)
             self.emit(SIGNAL("dropped"), links)      
         else:
             event.ignore()    
@@ -128,32 +156,60 @@ class Tree(QTreeWidget):
             return
 
         item = self.itemAt(pos)
-        #name = item.getPath()
-
         menu = QMenu(self)
-        action_Folder = QAction(self.os_icon('newfolder_wiz'),'New Folder', self)
+        action_Folder = QAction(os_icon('newfolder_wiz'),'New Folder', self)
         action_Folder.triggered.connect(lambda:self.newFolder(item))
-        action_addFolder = QAction(self.os_icon('importdir_wiz'),'Add Folder', self)
+        action_addFolder = QAction(os_icon('importdir_wiz'),'Add Folder', self)
         action_addFolder.triggered.connect(lambda:self.addFolder(item))
-        action_File = QAction(self.os_icon('new_untitled_text_file'),'New File', self)
+        action_File = QAction(os_icon('new_untitled_text_file'),'New File', self)
         action_File.triggered.connect(lambda:self.newFile(item))
-        action_addFile = QAction(self.os_icon('impc_obj'),'Add File', self)
+        action_addFile = QAction(os_icon('__imp_obj'),'Add File', self)
         action_addFile.triggered.connect(lambda:self.addFile(item))
+        action_Open = QAction('Open', self)
+        action_Open.triggered.connect(lambda:self.openProject(item))
+        action_Close = QAction('Close', self)
+        action_Close.triggered.connect(lambda:self.closeProject(item))
         action_Rename = QAction('Rename', self)
         action_Rename.triggered.connect(lambda:self.rename(item))
-        action_Delete = QAction(self.os_icon('trash'),'Delete', self)
+        action_Delete = QAction(os_icon('trash'),'Delete', self)
         action_Delete.triggered.connect(lambda:self.delete(item))
-        menu.addAction(action_Folder)
-        menu.addAction(action_addFolder)
-        menu.addAction(action_File)
-        menu.addAction(action_addFile)
-        menu.addSeparator()
-        menu.addAction(action_Rename)
-        menu.addAction(action_Delete)
+        if(item.isProject()):
+            if not(item.isClosed()):
+                menu.addAction(action_Folder)
+                menu.addAction(action_addFolder)
+                menu.addAction(action_File)
+                menu.addAction(action_addFile)
+                menu.addSeparator()
+                menu.addAction(action_Rename)
+                menu.addAction(action_Delete)
+                menu.addSeparator()
+                menu.addAction(action_Close)
+            else:
+                menu.addAction(action_Open)
+        else:
+            if(item.isDir()):
+                menu.addAction(action_Folder)
+                menu.addAction(action_addFolder)
+                menu.addAction(action_File)
+                menu.addAction(action_addFile)
+                menu.addSeparator()
+                menu.addAction(action_Rename)
+                menu.addAction(action_Delete)      
+            else:
+                menu.addAction(action_Rename)
+                menu.addAction(action_Delete)
+                
         menu.popup(QCursor.pos())
         
+    def openProject(self,item):
+        itempath = item.getPath()[0]
+        self.closed[self.projects.index(itempath)] = False
+        self.takeTopLevelItem(self.indexOfTopLevelItem(item))
+        self.addProject(itempath)
+        
     def closeProject(self,item):
-        print item.parent()
+        self.takeTopLevelItem(self.indexOfTopLevelItem(item))
+        self.addClosedProject(item.getPath()[0])
         
         
     def newFolder(self,item):
@@ -168,7 +224,11 @@ class Tree(QTreeWidget):
     def rename(self,item):
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
         if (ok and text != ''):
-            print text
+            newname = ospathjoin(ospathdirname(item.getPath()[0])+'/'+str(text))
+            try:
+                osrename(item.getPath()[0],newname)
+            except:
+                QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
         
     def delete(self,item):
         reply = QMessageBox.question(self,
@@ -179,8 +239,7 @@ class Tree(QTreeWidget):
             return
         elif reply == QMessageBox.Yes:
             try:
-                #os.remove(name)
-                print item.getPath()
+                recycle(item.getPath()[0])
             except:
                 QMessageBox.about(self,"Could Not Delete","Could Not Delete The File")
            

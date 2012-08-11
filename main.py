@@ -1,19 +1,21 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.35"
+__version__ = "0.40"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
 
 #TODO:
-#Need to add options for all GUI
-
-import platform
+#Add options for all GUI
+#Add Project Options
+#Add error markers
 
 from PyQt4.QtGui import (QMainWindow,QApplication,QPixmap,QSplashScreen,
-                         QIcon,QAction,QMenu,QMessageBox)
-from PyQt4.QtCore import SIGNAL,Qt,QProcess,QStringList,QString,QT_VERSION_STR,PYQT_VERSION_STR
+                         QIcon,QAction,QMenu,QMessageBox,QWidgetAction,
+                         QCheckBox,QFileDialog,QToolButton,QPushButton)
+from PyQt4.QtCore import (SIGNAL,Qt,QProcess,QStringList,QString,
+                          QT_VERSION_STR,PYQT_VERSION_STR,QSize)
 
 from ui_simple import Ui_MainWindow
 import icons_rc
@@ -22,7 +24,7 @@ from Widget import Editor,PyInterp
 #from Dialog import *
 from config import Config
 #from styles import *
-from globals import ospathsep,ospathjoin,ospathbasename,workDir
+from globals import ospathsep,ospathjoin,ospathbasename,workDir,OS_NAME,PY_VERSION
 import threading
 
 
@@ -46,14 +48,18 @@ class myThread (threading.Thread):
         self.proc = proc
         
     def run(self):
-        self.proc()
+        #self.proc()
         print "Starting "
         print "Exiting "
-
+        
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.setupUi(self)   
+        self.setupUi(self) 
+        self.files = None
+        self.projects = None
+        self.recent = None
+        self.dirty = None
         self.isRunning = False
         self.isFull = False
         self.isCmd = False
@@ -63,9 +69,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowTitle("Sabel")
         self.setWindowIcon(os_icon("sample"))
         self.init()
+        #print self.width()
           
     def init(self):
-        #self.initOS()
         self.initConfig()
         self.initToolBar()
         self.initCommand()
@@ -73,16 +79,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initProjects()
         #self.initStyles()
         self.connect(self, SIGNAL('triggered()'), self.closeEvent)
-        self.connect(self.tabWidget,SIGNAL("dropped"), self.createTab)
-       
+        self.connect(self.tabWidget,SIGNAL("dropped"), self.createTab) 
         #self.initInterpreter()
-        #print self.files.pop()
-        
-        
-    def initOS(self):
-        print platform.system() 
-        #print os.name    
-        #print ospathjoin("C:",ospathsep,"Code")   
             
     def initConfig(self):
         self.tabWidget.setTabsClosable(True)
@@ -108,6 +106,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.treeWidget.addProject(startDir)
         
     def ss(self,item):
+        #print item.getPath()
         self.createTab(item.getPath())
         
     def initStyles(self):
@@ -123,7 +122,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initInterpreter(self):
         self.ipy = PyInterp(self)
         self.ipy.initInterpreter(locals()) 
-        self.tabWidget_2.addTab(self.ipy, "Python")
+        self.tabWidget_3.addTab(self.ipy, "Python")
         
         
     def initToolBar(self):
@@ -133,18 +132,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_NewProject.setToolTip("Create a New Project")
         self.action_NewProject.setStatusTip("Create a New Project")
         
-        self.action_OpenProject = QAction(os_icon('prj_mode'), 'Open Project', self)
-        self.action_OpenProject.triggered.connect(self.openProject)
-        self.action_OpenProject.setToolTip("Open a Project")
-        self.action_OpenProject.setStatusTip("Open a Project")
-        
         self.action_New = QAction(os_icon('new_untitled_text_file'), 'New', self)
         self.action_New.setShortcut('Ctrl+N')
         self.action_New.triggered.connect(self.fileNew)
         self.action_New.setToolTip("Create a New File")
         self.action_New.setStatusTip("Create a New File")
         
-        self.action_Open = QAction(os_icon('impc_obj'), 'Open', self)
+        self.action_Open = QAction(os_icon('__imp_obj'), 'Open', self)
         self.action_Open.setShortcut('Ctrl+O')
         self.action_Open.triggered.connect(self.fileOpen)
         self.action_Open.setToolTip("Open File")
@@ -167,7 +161,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_About.triggered.connect(self.about)
         self.action_Run = QAction(os_icon('lrun_obj'), 'Run', self)
         self.action_Run.setShortcut('Ctrl+R')
-        self.action_Run.triggered.connect(self.runn)
+        self.action_Run.triggered.connect(self.run)
         self.action_RunFile = QAction(os_icon('start_ccs_task'), 'File', self)
         self.action_RunFile.triggered.connect(self.runFile)
         self.action_Stop = QAction(os_icon('term_sbook'), 'Stop', self)
@@ -188,7 +182,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_Full.triggered.connect(self.full)
         
         self.action_Syntax = QAction(os_icon('task_set'), 'Syntax', self)
-        men = QMenu()
+        men = QMenu()#public_co.gif
+        #chkBox =QCheckBox(men)
+        #chkBox.setText("MyCheckBox")
+        chkBoxAction=QWidgetAction(men)
+        #chkBoxAction.setDefaultWidget(QPixmap(":/Icons/public_co"))
+        men.addAction(chkBoxAction)
+
         men.addAction(QAction("C",self))
         men.addAction(QAction("C++",self))
         men.addAction(QAction("C#",self))
@@ -226,7 +226,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
         self.action_Stop.setDisabled(True)
         self.toolbar = self.addToolBar('ToolBar')
+        self.toolbar.setIconSize(QSize(16,16))
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
+        self.toolbar.setAllowedAreas(Qt.AllToolBarAreas)
+        
         self.toolbar.addAction(self.action_NewProject)
         #self.toolbar.addAction(self.action_OpenProject)
         self.toolbar.addAction(self.action_New)
@@ -248,6 +251,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolbar.addAction(self.action_Help)
         self.toolbar.addAction(self.action_About)
         self.toolbar.addAction(self.action_Full)
+        self.statusbar.addAction(self.action_Cmd)
+        
+        self.pushButton = QPushButton(self)
+        self.pushButton.setFlat(True)
+        self.pushButton.setIcon(os_icon('monitor_obj'))
+        self.pushButton.clicked.connect(self.cmd)
+        self.statusbar.addWidget(self.pushButton)
+        
         
             
     def createTab(self,nfile):
@@ -269,7 +280,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     tab.setText(infile.read())
                     tab.textChanged.connect(lambda:self.setDirty(nfile)) 
                 except:
-                    QMessageBox.about(self,"Can't Open","File Does Not Exist")                 
+                    QMessageBox.about(self,"Can't Open","File Does Not Exist")              
             else:
                 for i in nfile:
                     self.createTab(i)
@@ -320,34 +331,48 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 <p>
                 All rights reserved in accordance with
                 GPL v3 or later.
-                <p>This application can be used for
-                Squirrel and EmoFramework Projects.
+                <p>This application can be used for Squirrel and EmoFramework Projects.
+                <p>Squirrel Shell (c) 2006-2011, Constantin Makshin
+                <p>Squirrel (c) Alberto Demichelis
+                <p>zlib (c) Jean-loup Gailly and Mark Adler 
+                <p>Icons (c) Eclipse EPL
                 <p>Python %s - Qt %s - PyQt %s on %s
+                <p>Copyright (c) 2011 emo-framework project
                 <p>Created By: pyros2097
+                <p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+                 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,INCLUDING, BUT NOT 
+                 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
+                 FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
+                 EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
+                 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
+                 OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
+                 PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
+                 OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
+                 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
+                 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
+                 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
+                 POSSIBILITY OF SUCH DAMAGE. 
                 """ % ( 
-                __version__,platform.python_version(),
-                QT_VERSION_STR, PYQT_VERSION_STR, platform.system()))
+                __version__,PY_VERSION,
+                QT_VERSION_STR, PYQT_VERSION_STR,OS_NAME))
 
     def help(self):
         QMessageBox.about(self, "About Simple Editor","This is The Help")
-        
-    def newProject(self):
-        pass
     
     def openProject(self):
-        fname = unicode(QFileDialog.getExistingDirectory(self,"Open File"))
+        fname = str(QFileDialog.getExistingDirectory(self,"Open File"))
         if not (fname == ""):
-            for file in self.projects:
-                if(file != fname):
+            fname = fname+"/"
+            #print fname
+            for nfile in self.projects:
+                if(nfile != fname):
                     self.createProjects(fname)
                     config.addProject(fname)
                     return
                 else:
-                    QMessageBox.about(self, "Already Open","File Already Open")
+                    QMessageBox.about(self, "Already Open","Project Already Open")
                     return
-        else:
-            QMessageBox.about(self, "No File","No File Selected")
-            return
+        return
     
     def syntax(self):
         pass
@@ -357,22 +382,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def full(self):
         if not self.isFull:
-            super(MainWindow, self).setWindowFlags(Qt.Window | Qt.CustomizeWindowHint)
+            self.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint)
             self.isFull = True
         else:
-            super(MainWindow, self).setWindowFlags(Qt.Window)
+            self.setWindowFlags(Qt.Window)
             self.isFull = False
             
     def options(self):
         pass
-        #opt = UIOptions(self)
-        #opt.show()
-        
         
     def fileNew(self):
         pass
-        #self.createTab("untilted")
-        #self.statusBar().showMessage('File menu: New selected', 5000)
 
     def fileOpen(self):
         '''Open file'''
@@ -424,6 +444,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
             
     def closeEvent(self, event):
+        if(self.process.isOpen()):
+            self.process.kill()
+            self.process.close()
         for i in self.dirty:
             if i:
                 reply = QMessageBox.question(self,
@@ -434,8 +457,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     pass
                 elif reply == QMessageBox.Yes:
                     self.fileSaveAll()
+        
     
     def cmd(self):
+        if(self.tabWidget_3.isHidden()):
+            self.tabWidget_3.show()
+        else:
+            self.tabWidget_3.hide()
+            """
         self.CmdThread.setCommand("cmd")
         self.CmdThread.setArguments("dir")
         if self.isCmd == False:
@@ -446,37 +475,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.textEdit.clear()
             self.tabWidget_2.setCurrentIndex(1)
             self.CmdThread.start()
+            """
      
      
     def runn(self):
         self.CmdThread = myThread(self.run())
-        #self.CmdThread.start()
+        self.CmdThread.start()
         
     def runFile(self):
-        nfile = self.files[self.tabWidget.currentIndex()]
         if self.isRunning == False:
-            if self.process.isOpen():
-                self.process.kill()
-            self.isRunning = True
-            self.action_RunFile.setDisabled(True)
-            self.action_Stop.setEnabled(True)
-            self.textEdit.clear()
-            self.tabWidget_2.setCurrentIndex(1)
-            self.textEdit.append("Running")   
-            #self.process.start("sq "+"sqtest.nut")
-            #self.process.waitForFinished(msecs=5000)
-            self.process.kill()
+            self.cmd()
+            self.process.start("python")
+            
            
     def run(self):
         if self.isRunning == False:
             if self.process.isOpen():
                 self.process.kill()
             self.isRunning = True
-            #self.action_Run.setIcon(os_icon('run_exc'))
             self.action_Run.setDisabled(True)
             self.action_Stop.setEnabled(True)
+            if(self.tabWidget_3.isHidden()):
+                self.tabWidget_3.show()
             self.textEdit.clear()
-            self.tabWidget_2.setCurrentIndex(1)
+            self.tabWidget_3.setCurrentIndex(1)
             #Running: C:/CODE/Tools/icons.py (Wed Aug 08 17:15:55 2012)
             self.textEdit.append("Pushing main.nut\n")          
             self.process.start("adb -d push C:/CODE/main.nut /sdcard/")
@@ -498,12 +520,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.process.start("adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb shell kill")
             self.process.waitForFinished()
             self.process.kill()
-            self.tabWidget_2.setCurrentIndex(0)
-            #self.action_Run.setIcon(os_icon('lrun_obj'))
+            if not(self.tabWidget_3.isHidden()):
+                self.tabWidget_3.hide()
             self.action_Run.setEnabled(True)
             
     def readOutput(self):
         self.textEdit.append(QString(self.process.readAllStandardOutput()))
+        sb = self.textEdit.verticalScrollBar()
+        sb.setValue(sb.maximum())
         # self.cmdText += self.textEdit.toPlainText()
         # print self.cmdText
     def readErrors(self):

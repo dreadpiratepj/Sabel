@@ -67,11 +67,16 @@ class Config:
     def addProject(self,nfile):
         pros = self.projects()
         if(self.check(pros,nfile)):
-            pros.append(nfile)
-            try:
-                yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
-            except:
-                print "cannot open config file"
+            if(os.path.exists(nfile)):
+                pros.append(nfile)
+                try:
+                    yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
+                except:
+                    print "cannot open config file"
+            else:
+                "Folder Does not exist"
+        else:
+            pass
                 
     def removeProject(self,nfile):
         pros = self.projects()

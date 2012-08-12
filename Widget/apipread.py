@@ -32,7 +32,7 @@ class Main(QMainWindow):
         api.prepare()
 
     def started(self):
-        pass#QMessageBox.information(self, "Started", "Started")
+        print "api is starting"
 
     def finished(self):
         # save the api to a binary file

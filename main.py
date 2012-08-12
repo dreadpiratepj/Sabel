@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.40"
+__version__ = "0.41"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
@@ -24,40 +24,37 @@ from Widget import Editor,PyInterp
 #from Dialog import *
 from config import Config
 #from styles import *
-from globals import ospathsep,ospathjoin,ospathbasename,workDir,OS_NAME,PY_VERSION
+from globals import ospathsep,ospathjoin,ospathbasename,workDir,OS_NAME,PY_VERSION,os_icon
 import threading
 
 
 
 config = Config()
 workSpace = config.workSpace()
-fontSize = config.fontSize() 
+fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
 iconDir = ospathjoin(workDir,"Icons")
-
-
-#Python accesses local variables much more efficiently than global variables. 
-def os_icon(name):
-        return QIcon(":/{0}.gif".format("Icons"+ospathsep+name))
+adb = config.adb()
 
 
 class myThread (threading.Thread):
     def __init__(self, proc):
         threading.Thread.__init__(self)
         self.proc = proc
-        
+
     def run(self):
         #self.proc()
         print "Starting "
         print "Exiting "
-        
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.setupUi(self) 
-        self.files = None
-        self.projects = None
+        self.setupUi(self)
+	#Important must be empty
+        self.files = []
+        self.projects = []
         self.recent = None
         self.dirty = None
         self.isRunning = False
@@ -70,7 +67,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setWindowIcon(os_icon("sample"))
         self.init()
         #print self.width()
-          
+
     def init(self):
         self.initConfig()
         self.initToolBar()
@@ -79,77 +76,75 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initProjects()
         #self.initStyles()
         self.connect(self, SIGNAL('triggered()'), self.closeEvent)
-        self.connect(self.tabWidget,SIGNAL("dropped"), self.createTab) 
+        self.connect(self.tabWidget,SIGNAL("dropped"), self.createTab)
         #self.initInterpreter()
-            
+
     def initConfig(self):
         self.tabWidget.setTabsClosable(True)
-        #Important must be empty
-        self.files = [] 
         self.projects = config.projects()
         self.recent = config.recent()
         self.dirty = []
         self.createTab(config.files())
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.tabWidget.setTabShape(1)
-        
+
     def initTree(self):
         self.treeWidget.itemDoubleClicked.connect(self.ss)
-        
+
     def initProjects(self):
-        if self.projects != None:
-            for i in self.projects:      
+        if len(self.projects) != 0:
+            for i in self.projects:
                 self.createProjects(i)
-        
-     
+
+
     def createProjects(self,startDir):
         self.treeWidget.addProject(startDir)
-        
+
     def ss(self,item):
-        #print item.getPath()
-        self.createTab(item.getPath())
-        
+        if(item.isFile()):
+            self.createTab(item.getPath())
+
     def initStyles(self):
         self.tabWidget.setStyleSheet(stl)
         #self.statusBar().setStyleSheet(statl)
-        #self.textEdit.setStyleSheet(scl) 
-        #self.toolbar.setStyleSheet(ttl)     
-   
+        #self.textEdit.setStyleSheet(scl)
+        #self.toolbar.setStyleSheet(ttl)
+
     def initCommand(self):
         self.connect(self.process, SIGNAL("readyReadStandardOutput()"), self.readOutput)
         self.connect(self.process, SIGNAL("readyReadStandardError()"), self.readErrors)
-        
+
     def initInterpreter(self):
         self.ipy = PyInterp(self)
-        self.ipy.initInterpreter(locals()) 
+        self.ipy.initInterpreter(locals())
         self.tabWidget_3.addTab(self.ipy, "Python")
-        
-        
+
+
     def initToolBar(self):
         self.action_NewProject = QAction(os_icon('newprj_wiz'), 'Project', self)
         self.action_NewProject.setShortcut('Ctrl+P')
         self.action_NewProject.triggered.connect(self.openProject)
         self.action_NewProject.setToolTip("Create a New Project")
         self.action_NewProject.setStatusTip("Create a New Project")
-        
+
         self.action_New = QAction(os_icon('new_untitled_text_file'), 'New', self)
         self.action_New.setShortcut('Ctrl+N')
         self.action_New.triggered.connect(self.fileNew)
         self.action_New.setToolTip("Create a New File")
         self.action_New.setStatusTip("Create a New File")
-        
+
         self.action_Open = QAction(os_icon('__imp_obj'), 'Open', self)
         self.action_Open.setShortcut('Ctrl+O')
         self.action_Open.triggered.connect(self.fileOpen)
         self.action_Open.setToolTip("Open File")
         self.action_Open.setStatusTip("Open File")
-        
+
         self.action_Save = QAction(os_icon('save_edit'), 'Save', self)
         self.action_Save.setShortcut('Ctrl+S')
         self.action_Save.triggered.connect(self.fileSave)
         self.action_Save.setToolTip("Save Current File")
         self.action_Save.setStatusTip("Save Current File")
-        
+
         self.action_SaveAll = QAction(os_icon('saveall_edit'), 'SaveAll', self)
         self.action_SaveAll.setShortcut('Ctrl+A')
         self.action_SaveAll.triggered.connect(self.fileSaveAll)
@@ -180,7 +175,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_Full = QAction(os_icon('task_set'), 'Full', self)
         self.action_Full.setShortcut('Shift+Enter')
         self.action_Full.triggered.connect(self.full)
-        
+
         self.action_Syntax = QAction(os_icon('task_set'), 'Syntax', self)
         men = QMenu()#public_co.gif
         #chkBox =QCheckBox(men)
@@ -198,9 +193,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         men.addAction(QAction("Ruby",self))
         men.addAction(QAction("Squirrel",self))
         self.action_Syntax.setMenu(men)
-        
-        
-        
+
+
+
         self.action_Style = QAction(os_icon('welcome16'), 'Style', self)
         self.action_Style.triggered.connect(self.style)
         men1 = QMenu()
@@ -221,15 +216,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         men1.addAction(QAction("Sunburst",self))
         men1.addAction(QAction("Twilight",self))
         self.action_Style.setMenu(men1)
-        
-        
-        
+
+
+
         self.action_Stop.setDisabled(True)
         self.toolbar = self.addToolBar('ToolBar')
         self.toolbar.setIconSize(QSize(16,16))
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.toolbar.setAllowedAreas(Qt.AllToolBarAreas)
-        
+
         self.toolbar.addAction(self.action_NewProject)
         #self.toolbar.addAction(self.action_OpenProject)
         self.toolbar.addAction(self.action_New)
@@ -251,23 +246,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolbar.addAction(self.action_Help)
         self.toolbar.addAction(self.action_About)
         self.toolbar.addAction(self.action_Full)
-        self.statusbar.addAction(self.action_Cmd)
-        
-        self.pushButton = QPushButton(self)
-        self.pushButton.setFlat(True)
-        self.pushButton.setIcon(os_icon('monitor_obj'))
-        self.pushButton.clicked.connect(self.cmd)
-        self.statusbar.addWidget(self.pushButton)
-        
-        
-            
+
     def createTab(self,nfile):
         if(nfile != None):
             if len(self.files) != 0:
                 for i in self.files:
                     if(i == nfile):
                         QMessageBox.about(self,"Can't Open","File Already Open")
-                        return  
+                        return
             if type(nfile) == str:
                 config.addFile(nfile)
                 self.files.append(nfile)
@@ -278,17 +264,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     tab.setObjectName("tab"+nfile)
                     self.tabWidget.addTab(tab,ospathbasename(nfile))
                     tab.setText(infile.read())
-                    tab.textChanged.connect(lambda:self.setDirty(nfile)) 
+                    tab.textChanged.connect(lambda:self.setDirty(nfile))
                 except:
-                    QMessageBox.about(self,"Can't Open","File Does Not Exist")              
+                    QMessageBox.about(self,"Can't Open","File Does Not Exist")
             else:
                 for i in nfile:
                     self.createTab(i)
             #This line sets the opened file to display Important not checked
             self.tabWidget.setCurrentIndex(len(self.files)-1)
-                     
-                     
-        
+
+
+
     def closeTab(self,index):
         '''Boolean result invocation method.'''
         done = True
@@ -301,13 +287,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 done = False
             elif reply == QMessageBox.Yes:
                 done = self.fileSave(index)
-         
+
         if(done):
-            config.removeFile(self.files[index])    
+            config.removeFile(self.files[index])
             self.files.remove(self.files[index])
-            self.tabWidget.removeTab(index)    
+            self.tabWidget.removeTab(index)
         return True
-        
+
     def setDirty(self,file):
         '''On change of text in textEdit window, set the flag
         "dirty" to True'''
@@ -334,31 +320,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 <p>This application can be used for Squirrel and EmoFramework Projects.
                 <p>Squirrel Shell (c) 2006-2011, Constantin Makshin
                 <p>Squirrel (c) Alberto Demichelis
-                <p>zlib (c) Jean-loup Gailly and Mark Adler 
+                <p>zlib (c) Jean-loup Gailly and Mark Adler
                 <p>Icons (c) Eclipse EPL
                 <p>Python %s - Qt %s - PyQt %s on %s
                 <p>Copyright (c) 2011 emo-framework project
                 <p>Created By: pyros2097
                 <p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-                 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,INCLUDING, BUT NOT 
-                 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND 
-                 FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO 
-                 EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE 
-                 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, 
-                 OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, 
-                 PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, 
-                 OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY 
-                 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, 
-                 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY 
-                 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE 
-                 POSSIBILITY OF SUCH DAMAGE. 
-                """ % ( 
+                 "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,INCLUDING, BUT NOT
+                 LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+                 FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+                 EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+                 FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+                 OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+                 PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+                 OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+                 THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+                 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+                 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+                 POSSIBILITY OF SUCH DAMAGE.
+                """ % (
                 __version__,PY_VERSION,
                 QT_VERSION_STR, PYQT_VERSION_STR,OS_NAME))
 
     def help(self):
         QMessageBox.about(self, "About Simple Editor","This is The Help")
-    
+
     def openProject(self):
         fname = str(QFileDialog.getExistingDirectory(self,"Open File"))
         if not (fname == ""):
@@ -373,10 +359,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     QMessageBox.about(self, "Already Open","Project Already Open")
                     return
         return
-    
+
     def syntax(self):
         pass
-    
+
     def style(self):
         pass
 
@@ -387,10 +373,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             self.setWindowFlags(Qt.Window)
             self.isFull = False
-            
+
     def options(self):
         pass
-        
+
     def fileNew(self):
         pass
 
@@ -409,11 +395,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     return
         else:
             return
-        
+
     def fileSave(self):
         index = self.tabWidget.currentIndex()
         if not self.dirty[index]:
-            return 
+            return
         fname = self.files[index]
         fl = open(fname, 'w')
         tempText = self.tabWidget.widget(index).text()
@@ -424,11 +410,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         else:
             QMessageBox.about(self, "Can't Save","Failed to save ...")
             self.statusBar().showMessage('Failed to save ...', 5000)
-        
+
     def fileSaveAll(self):
         def fileSaveIndex(index):
                 if not self.dirty[index]:
-                    return 
+                    return
                 fname = self.files[index]
                 fl = open(fname, 'w')
                 tempText = self.tabWidget.widget(index).text()
@@ -441,8 +427,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     self.statusBar().showMessage('Failed to save ...', 5000)
         for file in self.files:
             fileSaveIndex(self.files.index(file))
-        
-            
+
+
     def closeEvent(self, event):
         if(self.process.isOpen()):
             self.process.kill()
@@ -457,37 +443,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     pass
                 elif reply == QMessageBox.Yes:
                     self.fileSaveAll()
-        
-    
+
+
     def cmd(self):
         if(self.tabWidget_3.isHidden()):
             self.tabWidget_3.show()
         else:
             self.tabWidget_3.hide()
-            """
-        self.CmdThread.setCommand("cmd")
-        self.CmdThread.setArguments("dir")
-        if self.isCmd == False:
-            self.isCmd = True
-            self.action_Cmd.setIcon(os_icon('monitor_view'))
-            self.action_Cmd.setDisabled(True)
-            self.action_Stop.setEnabled(True)
-            self.textEdit.clear()
-            self.tabWidget_2.setCurrentIndex(1)
-            self.CmdThread.start()
-            """
-     
-     
+
+
     def runn(self):
         self.CmdThread = myThread(self.run())
         self.CmdThread.start()
-        
+
     def runFile(self):
         if self.isRunning == False:
             self.cmd()
             self.process.start("python")
-            
-           
+
+
     def run(self):
         if self.isRunning == False:
             if self.process.isOpen():
@@ -500,30 +474,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.textEdit.clear()
             self.tabWidget_3.setCurrentIndex(1)
             #Running: C:/CODE/Tools/icons.py (Wed Aug 08 17:15:55 2012)
-            self.textEdit.append("Pushing main.nut\n")          
-            self.process.start("adb -d push C:/CODE/main.nut /sdcard/")
+            self.textEdit.append("Pushing main.nut\n")
+            self.process.start(adb[0])
             self.process.waitForFinished()
             self.process.kill()
             self.textEdit.append("Starting Activity\n")
-            self.process.start("adb -d shell am start -a android.intent.action.MAIN -n com.emo_framework.examples/com.emo_framework.EmoActivity")
+            self.process.start(adb[1])
             self.process.waitForFinished()
             self.textEdit.append("Logging")
             self.process.kill()
-            self.process.start("adb -d logcat -s EmoFramework")
-            
+            self.process.start(adb[2])
+
     def stop(self):
         if self.isRunning == True:
             self.isRunning = False
             self.action_Stop.setDisabled(True)
             self.textEdit.append("Stopped")
             self.process.kill()
-            self.process.start("adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb shell kill")
+            self.process.start(adb[3])
             self.process.waitForFinished()
             self.process.kill()
             if not(self.tabWidget_3.isHidden()):
                 self.tabWidget_3.hide()
             self.action_Run.setEnabled(True)
-            
+
     def readOutput(self):
         self.textEdit.append(QString(self.process.readAllStandardOutput()))
         sb = self.textEdit.verticalScrollBar()
@@ -531,7 +505,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # self.cmdText += self.textEdit.toPlainText()
         # print self.cmdText
     def readErrors(self):
-        self.textEdit.append("error: " + QString(self.process.readAllStandardError()))
+        self.textEdit_2.append("error: " + QString(self.process.readAllStandardError()))
 
 if __name__ == "__main__":
     app = QApplication([])
@@ -540,7 +514,7 @@ if __name__ == "__main__":
     splash.setMask(splash_pix.mask())
     splash.show()
     app.processEvents()
-    
+
     # Simulate something that takes time
     frame = MainWindow()
     frame.showMaximized()

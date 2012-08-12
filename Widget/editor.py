@@ -1,13 +1,15 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs
+from globals import ospathjoin,workDir
 
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
 
     def __init__(self,fontSize=10,fontName='Courier',parent=None):
         super(Editor, self).__init__(parent)
-        # Set the default font
+        
+        
         font = QFont()
         font.setFamily(fontName)
         font.setFixedPitch(True)
@@ -38,40 +40,29 @@ class Editor(QsciScintilla):
         # the current position
         #
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
+        
 
         # Current line visible with special background color
         self.setCaretLineVisible(True)
         self.setCaretLineBackgroundColor(QColor("#ffe4e4"))
-        # Set Python lexer
-        # Set style for Python comments (style number 1) to a fixed-width
-        # courier.
-        # QsciLexerSquirrel()
+        
+        
         self.lexer = QsciLexerPython()
+        #print ospathjoin(workDir,"emo.api")
         self.api = QsciAPIs(self.lexer)
-        self.lexer.setDefaultFont(font)
+        #api.load(ospathjoin(workDir,"emo.api"))
         self.code_complete()
         self.api.prepare()
+        self.lexer.setDefaultFont(font)
         self.setLexer(self.lexer) #Very important do not change line otherwise gg
         
-        
-        
-        self.setAutoCompletionThreshold(2)
+        self.setAutoCompletionThreshold(1)
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
         #self.setAutoCompletionSource(QsciScintilla.AcsAll)
-        self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
-
-        # Don't want to see the horizontal scrollbar at all
-        # Use raw message to Scintilla here (all messages are documented
-        # here: http://www.scintilla.org/ScintillaDoc.html)
-      #  self.SendScintilla(QsciScintilla.SCI_SETHSCROLLBAR, 0)
-
-        # not too small
-       # self.setMinimumSize(600, 450)
-
+        #self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
+        
 
     def code_complete(self):
-        #self.api.load("test.api") 
-        #Runtime
         self.api.add("emo.Runtime?0(use = runtime)")
         self.api.add("runtime.import?1(filename)")
         self.api.add("emo.Runtime.import?1(filename)")

@@ -5,61 +5,75 @@ from globals import (oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,
                      ospathbasename,os_icon,osremove,osrename,ospathdirname,
                      recycle)
 
-class File(QTreeWidgetItem):
-    def __init__(self,parent,name,path,isDir = False):
+
+class Dir(QTreeWidgetItem):
+    def __init__(self,parent,name,path):
         QTreeWidgetItem.__init__(self,parent)
-        self.path = []
+        self.path = ospathjoin(path,name)
         self.setText (0, name)
-        self.dir = isDir
-        if(self.dir):
-            self.setIcon(0,os_icon("package_obj"))#fldr_obj
-        else:
-            if(name.endswith(".txt")):
-                self.setIcon(0,os_icon("file_obj"))
-            elif(name.endswith(".nut")):
-                self.setIcon(0,os_icon("file_obj"))
-            elif(name.endswith(".py")):
-                self.setIcon(0,os_icon("file_obj"))
-            elif(name.endswith(".c")):
-                self.setIcon(0,os_icon("file_obj"))
-        self.addPath(path+name)
-        
-    def addPath(self,path):
-        self.path.append(path)
+        self.setIcon(0,os_icon("package_obj"))
     
     def getPath(self):
-        return ospathjoin(self.path)
-    
-    def isDir(self):
-        return self.dir
+        return self.path
     def isProject(self):
         return False
+    def isDir(self):
+        return True
+    def isFile(self):
+        return False
+
+class File(QTreeWidgetItem):
+    def __init__(self,parent,name,path):
+        QTreeWidgetItem.__init__(self,parent)
+        self.path = ospathjoin(path,name)
+        self.setText (0, name)
+        #mime = QMimeData()
+        #print mime.hasFormat(path)
+        if(name.endswith(".txt")):
+            self.setIcon(0,os_icon("file_obj"))
+        elif(name.endswith(".nut")):
+            self.setIcon(0,os_icon("file_obj"))
+        elif(name.endswith(".py")):
+            self.setIcon(0,os_icon("file_obj"))
+        elif(name.endswith(".c")):
+            self.setIcon(0,os_icon("file_obj"))
+        else:
+            self.setIcon(0,os_icon("file_obj"))
+    def getPath(self):
+        return self.path
+    def isProject(self):
+        return False
+    def isDir(self):
+        return False
+    def isFile(self):
+        return True
+    def isDoc(self):
+        return True
         
 class Project(QTreeWidgetItem):
     Count = 0
     def __init__(self,parent,startDir,closed = False):
         QTreeWidgetItem.__init__(self,parent)
-        self.path = []
+        self.path = ospathjoin(startDir)
         self.closed = closed
         if(self.closed):
             self.setIcon(0,os_icon('cprj_obj'))
         else:
             self.setIcon(0,os_icon('prj_obj'))
-        self.addPath(startDir)
         self.setText (0, startDir) # set the text of the first 0
         self.setToolTip(0,startDir)
         self.Count += 1
         
-    def addPath(self,path):
-        self.path.append(path)
     
     def getPath(self):
-        return ospathjoin(self.path)
+        return self.path
     
-    def isDir(self):
-        return False
     def isProject(self):
         return True
+    def isDir(self):
+        return False
+    def isFile(self):
+        return False
     def isClosed(self):
         return self.closed
         
@@ -80,8 +94,8 @@ class Tree(QTreeWidget):
         for d in oslistdir(path):
             if  ospathisdir(ospathjoin(path+d)) is True:
                 if not ospathjoin(d).startswith('.'):
-                    i = File(parent,d,path,True) # create QTreeWidget the sub i
-                    self.readFiles(path+d,i) 
+                    i = Dir(parent,d,path) # create QTreeWidget the sub i
+                    self.readFiles(ospathjoin(path,d),i) 
         self.readFiles(path,parent)
                  
             
@@ -169,6 +183,10 @@ class Tree(QTreeWidget):
         action_Open.triggered.connect(lambda:self.openProject(item))
         action_Close = QAction('Close', self)
         action_Close.triggered.connect(lambda:self.closeProject(item))
+        action_RenameProject = QAction('Rename Project', self)
+        action_RenameProject.triggered.connect(lambda:self.renameProject(item))
+        action_RenameDir = QAction('Rename Dir', self)
+        action_RenameDir.triggered.connect(lambda:self.renameDir(item))
         action_Rename = QAction('Rename', self)
         action_Rename.triggered.connect(lambda:self.rename(item))
         action_Delete = QAction(os_icon('trash'),'Delete', self)
@@ -180,7 +198,7 @@ class Tree(QTreeWidget):
                 menu.addAction(action_File)
                 menu.addAction(action_addFile)
                 menu.addSeparator()
-                menu.addAction(action_Rename)
+                menu.addAction(action_RenameProject)
                 menu.addAction(action_Delete)
                 menu.addSeparator()
                 menu.addAction(action_Close)
@@ -193,7 +211,7 @@ class Tree(QTreeWidget):
                 menu.addAction(action_File)
                 menu.addAction(action_addFile)
                 menu.addSeparator()
-                menu.addAction(action_Rename)
+                menu.addAction(action_RenameDir)
                 menu.addAction(action_Delete)      
             else:
                 menu.addAction(action_Rename)
@@ -221,25 +239,46 @@ class Tree(QTreeWidget):
     def addFile(self,item):
         pass
     
+    def renameProject(self,item):
+        text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
+        if (ok and text != ''):
+            newname = ospathjoin(ospathdirname(item.getPath()),str(text))
+            try:
+                #print newname
+                osrename(item.getPath(),newname)
+            except:
+                QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
+    
+    def renameDir(self,item):
+        text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
+        if (ok and text != ''):
+            newname = ospathjoin(ospathdirname(item.getPath()),str(text))
+            try:
+                #print newname
+                osrename(item.getPath(),newname)
+            except:
+                QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
+        
     def rename(self,item):
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
         if (ok and text != ''):
-            newname = ospathjoin(ospathdirname(item.getPath()[0])+'/'+str(text))
+            newname = ospathjoin(ospathdirname(item.getPath()),str(text))
             try:
-                osrename(item.getPath()[0],newname)
+                #print newname
+                osrename(item.getPath(),newname)
             except:
                 QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
         
     def delete(self,item):
         reply = QMessageBox.question(self,
                     "Delete",
-                    "Are you sure you want to Delete,You Can never get this file Back?",
+                    "Are you sure you want to Delete,This Will Send To Recycle Bin?",
                     QMessageBox.Yes|QMessageBox.No)
         if reply == QMessageBox.No:
             return
         elif reply == QMessageBox.Yes:
             try:
-                recycle(item.getPath()[0])
+                #print item.getPath()
+                recycle(item.getPath())
             except:
-                QMessageBox.about(self,"Could Not Delete","Could Not Delete The File")
-           
+                QMessa

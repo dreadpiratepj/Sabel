@@ -1,5 +1,6 @@
 from PyQt4 import QtCore, QtGui
 from Widget import Tab,Tree
+from globals import os_icon
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -38,6 +39,7 @@ class Ui_MainWindow(object):
         self.treeWidget.setObjectName("treeWidget")
         self.horizontalLayout_3.addWidget(self.treeWidget)
         
+        
         #Output
         self.tab_6 = QtGui.QWidget()
         self.tab_6.setObjectName("tab_6")
@@ -62,24 +64,77 @@ class Ui_MainWindow(object):
         self.textEdit_2.setObjectName("textEdit_2")
         self.horizontalLayout_4.addWidget(self.textEdit_2)
         
+        #Find
+        self.tab_8 = QtGui.QWidget()
+        self.tab_8.setObjectName("tab_8")
+        self.horizontalLayout_5 = QtGui.QHBoxLayout(self.tab_8)
+        self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+        self.lineEdit = QtGui.QLineEdit(self.tab_8)
+        self.lineEdit.setObjectName("lineEdit")
+        self.lineEdit_2 = QtGui.QLineEdit(self.tab_8)
+        self.lineEdit_2.setObjectName("lineEdit_2")
+        self.find = QtGui.QPushButton(self.tab_8)
+        self.find.setText("Find")
+        self.replacefind = QtGui.QPushButton(self.tab_8)
+        self.replacefind.setText("Replace/Find")
+        self.replace = QtGui.QPushButton(self.tab_8)
+        self.replace.setText("Replace")
+        self.replaceAll = QtGui.QPushButton(self.tab_8)
+        self.replaceAll.setText("Replace All")
+        self.horizontalLayout_5.addWidget(self.find)
+        self.horizontalLayout_5.addWidget(self.lineEdit)
+        self.horizontalLayout_5.addWidget(self.lineEdit_2)
+        self.horizontalLayout_5.addWidget(self.replacefind)
+        self.horizontalLayout_5.addWidget(self.replace)
+        self.horizontalLayout_5.addWidget(self.replaceAll)
+        self.horizontalLayout_5.setMargin(0)
+        self.tab_8.setMaximumSize(16777215, 25)
+        
         self.tabWidget_2.addTab(self.tab_5,"Projects")
         self.tabWidget_3.addTab(self.tab_7,"Error")
         self.tabWidget_3.addTab(self.tab_6,"Output")
+        self.tabWidget_3.setTabIcon(0,os_icon("message_error"))
+        self.tabWidget_3.setTabIcon(1,os_icon("sample"))
+        
         #Splitters
         self.split1 = QtGui.QSplitter(QtCore.Qt.Horizontal)
         self.split1.addWidget(self.tabWidget)
         self.split1.addWidget(self.tabWidget_2)
         self.split2 = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.split2.addWidget(self.split1)
+        self.split2.addWidget(self.tab_8)
         self.split2.addWidget(self.tabWidget_3)
         self.tabWidget_3.hide()
         self.horizontalLayout.addWidget(self.split2)
+        
+        #Init
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtGui.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.tabWidget.setCurrentIndex(-1)
         self.tabWidget_2.setCurrentIndex(0)
-        #QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.tab_8.hide()
+        
+        #Status
+        self.cmdButton = QtGui.QPushButton(self)
+        self.cmdButton.setFlat(True)
+        self.cmdButton.setIcon(os_icon('monitor_obj'))
+        self.cmdButton.clicked.connect(self.cmd)
+        self.cmdButton.setShortcut('Ctrl+O')
+        #self.cmdButton.setToolTip("Opens Console Ctrl+O")
+        self.findButton = QtGui.QPushButton(self)
+        self.findButton.setFlat(True)
+        self.findButton.setIcon(os_icon('find_obj'))
+        self.findButton.setShortcut("Ctrl+F")
+        #self.findButton.setToolTip("Opens Find Bar Ctrl+F")
+        self.findButton.clicked.connect(self.findBarShow)
+        self.statusbar.addWidget(self.cmdButton)
+        self.statusbar.addWidget(self.findButton)
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
-
+        
+    def findBarShow(self):
+        if(self.tab_8.isHidden()):
+            self.tab_8.show()
+        else:
+            self.tab_8.hide()

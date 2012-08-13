@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.41"
+__version__ = "0.42"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
@@ -311,7 +311,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setTabText(index,flbase)
 
     def about(self):
-        QMessageBox.about(self, "About IDE",
+        QMessageBox.about(self, "About Sabel IDE",
                 """
                 <b>Sabel</b> v%s
                 <p>
@@ -506,6 +506,29 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         # print self.cmdText
     def readErrors(self):
         self.textEdit_2.append("error: " + QString(self.process.readAllStandardError()))
+        
+    def findCurrentText(self):
+        #print self.caseSensitive.isChecked()
+        #print self.wholeWord.isChecked()
+        #print self.regex.isChecked()
+        #print self.backward.isChecked()
+        edt = self.tabWidget.widget(self.tabWidget.currentIndex())
+        edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())
+        
+    def replaceCurrentText(self):
+        edt = self.tabWidget.widget(self.tabWidget.currentIndex())
+        done = edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())
+        if(done):
+            edt.replaceText(self.lineEdit_2.text())
+        else:
+            QMessageBox.about(self, "About Sabel IDE","Could Not Find Text")
+        return done
+            
+    def replaceAllText(self):
+        edt = self.tabWidget.widget(self.tabWidget.currentIndex())
+        while(edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())):
+            edt.replaceText(self.lineEdit_2.text())
+        
 
 if __name__ == "__main__":
     app = QApplication([])

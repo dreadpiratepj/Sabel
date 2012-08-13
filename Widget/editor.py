@@ -328,4 +328,30 @@ class Editor(QsciScintilla):
             self.markerDelete(nline, self.ARROW_MARKER_NUM)
         else:
             self.markerAdd(nline, self.ARROW_MARKER_NUM)
+            
+            
+    """
+    findFirst     (     const QString &      expr,
+        bool      re,
+        bool      cs,
+        bool      wo,
+        bool      wrap,
+        bool      forward = true,
+        int      line = -1,
+        int      index = -1,
+        bool      show = true,
+        bool      posix = false 
+    )         [virtual]
+    """
+    def findText(self,text,re,cs,wo,bk):
+        if(text != ''):
+            done = self.findFirst(text,re,cs,wo,True,not bk)
+            return done
+     
+    def replaceText(self,text):
+        self.replace(text)
+        
+    def replaceFindText(self,text):
+        self.replace(text)
+        
 

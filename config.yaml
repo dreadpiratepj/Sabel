@@ -2,11 +2,10 @@ ADB:
 - adb -d push C:/CODE/main.nut /sdcard/
 - adb -d shell am start -a android.intent.action.MAIN -n com.emo_framework.examples/com.emo_framework.EmoActivity
 - adb -d logcat -s EmoFramework
-- adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb shell kill
+- adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb
+  shell kill
 File:
 - C:/CODE/assets/main.nut
-- C:/CODE/Sabel/ui_simple.py
-- C:/CODE/Sabel/main.py
 Project:
 - C:/CODE/assets/
 Recent:

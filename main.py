@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.42"
+__version__ = "0.43"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
@@ -14,64 +14,41 @@ __email__ = 'pyros2097@gmail.com'
 from PyQt4.QtGui import (QMainWindow,QApplication,QPixmap,QSplashScreen,
                          QIcon,QAction,QMenu,QMessageBox,QWidgetAction,
                          QCheckBox,QFileDialog,QToolButton,QPushButton)
-from PyQt4.QtCore import (SIGNAL,Qt,QProcess,QStringList,QString,
+from PyQt4.QtCore import (SIGNAL,Qt,QStringList,QString,
                           QT_VERSION_STR,PYQT_VERSION_STR,QSize)
 
-from ui_simple import Ui_MainWindow
+from ui import Ui_MainWindow
 import icons_rc
 
-from Widget import Editor,PyInterp
+from Widget import Editor,PyInterp,Adb
 #from Dialog import *
 from config import Config
-#from styles import *
-from globals import ospathsep,ospathjoin,ospathbasename,workDir,OS_NAME,PY_VERSION,os_icon
-import threading
+from adb import Adb
+from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
+                     OS_NAME,PY_VERSION,os_icon,config,workSpace,fontSize,fontName,
+                     iconSize,iconDir,adb)
 
 
 
-config = Config()
-workSpace = config.workSpace()
-fontSize = config.fontSize()
-fontName = config.fontName()
-iconSize = config.iconSize()
-iconDir = ospathjoin(workDir,"Icons")
-adb = config.adb()
-
-
-class myThread (threading.Thread):
-    def __init__(self, proc):
-        threading.Thread.__init__(self)
-        self.proc = proc
-
-    def run(self):
-        #self.proc()
-        print "Starting "
-        print "Exiting "
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
-        super(MainWindow, self).__init__(parent)
-        self.setupUi(self)
+        QMainWindow.__init__(self,parent)
+        self.setupUi(self)
 	#Important must be empty
         self.files = []
         self.projects = []
         self.recent = None
         self.dirty = None
-        self.isRunning = False
         self.isFull = False
-        self.isCmd = False
-        self.CmdThread = None
-        self.process = QProcess(self)
-        self.cmdText = ""
+        self.aaa = Adb(self)
         self.setWindowTitle("Sabel")
         self.setWindowIcon(os_icon("sample"))
         self.init()
-        #print self.width()
 
     def init(self):
         self.initConfig()
         self.initToolBar()
-        self.initCommand()
         self.initTree()
         self.initProjects()
         #self.initStyles()
@@ -110,10 +87,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         #self.textEdit.setStyleSheet(scl)
         #self.toolbar.setStyleSheet(ttl)
 
-    def initCommand(self):
-        self.connect(self.process, SIGNAL("readyReadStandardOutput()"), self.readOutput)
-        self.connect(self.process, SIGNAL("readyReadStandardError()"), self.readErrors)
-
     def initInterpreter(self):
         self.ipy = PyInterp(self)
         self.ipy.initInterpreter(locals())
@@ -123,15 +96,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initToolBar(self):
         self.action_NewProject = QAction(os_icon('newprj_wiz'), 'Project', self)
         self.action_NewProject.setShortcut('Ctrl+P')
-        self.action_NewProject.triggered.connect(self.openProject)
+        self.action_NewProject.triggered.connect(self.newProject)
         self.action_NewProject.setToolTip("Create a New Project")
         self.action_NewProject.setStatusTip("Create a New Project")
-
-        self.action_New = QAction(os_icon('new_untitled_text_file'), 'New', self)
-        self.action_New.setShortcut('Ctrl+N')
-        self.action_New.triggered.connect(self.fileNew)
-        self.action_New.setToolTip("Create a New File")
-        self.action_New.setStatusTip("Create a New File")
 
         self.action_Open = QAction(os_icon('__imp_obj'), 'Open', self)
         self.action_Open.setShortcut('Ctrl+O')
@@ -156,19 +123,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.action_About.triggered.connect(self.about)
         self.action_Run = QAction(os_icon('lrun_obj'), 'Run', self)
         self.action_Run.setShortcut('Ctrl+R')
-        self.action_Run.triggered.connect(self.run)
+        self.action_Run.triggered.connect(self.aaa.run)
         self.action_RunFile = QAction(os_icon('start_ccs_task'), 'File', self)
-        self.action_RunFile.triggered.connect(self.runFile)
         self.action_Stop = QAction(os_icon('term_sbook'), 'Stop', self)
         self.action_Stop.setShortcut('Ctrl+Q')
-        self.action_Stop.triggered.connect(self.stop)
-        self.action_Cmd = QAction(os_icon('monitor_obj'), 'Cmd', self)
-        self.action_Cmd.setShortcut('Ctrl+B')
-        self.action_Cmd.triggered.connect(self.cmd)
+        self.action_Stop.triggered.connect(self.aaa.stop)
         self.action_Design = QAction(os_icon('task_set'), 'Design', self)
-        self.action_Design.triggered.connect(self.stop)
+        #self.action_Design.triggered.connect(self.stop)
         self.action_Todo = QAction(os_icon('task_set'), 'Todo', self)
-        self.action_Todo.triggered.connect(self.stop)
+        #self.action_Todo.triggered.connect(self.stop)
         #Only variation CHeck Later
         self.action_Options = QAction(QIcon(":/{0}.png".format("Icons"+ospathsep+'emblem-system')), 'Options', self)
         self.action_Options.triggered.connect(self.options)
@@ -226,8 +189,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolbar.setAllowedAreas(Qt.AllToolBarAreas)
 
         self.toolbar.addAction(self.action_NewProject)
-        #self.toolbar.addAction(self.action_OpenProject)
-        self.toolbar.addAction(self.action_New)
         self.toolbar.addAction(self.action_Open)
         self.toolbar.addAction(self.action_Save)
         self.toolbar.addAction(self.action_SaveAll)
@@ -235,7 +196,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.toolbar.addAction(self.action_Run)
         self.toolbar.addAction(self.action_RunFile)
         self.toolbar.addAction(self.action_Stop)
-        self.toolbar.addAction(self.action_Cmd)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.action_Design)
         self.toolbar.addAction(self.action_Todo)
@@ -270,7 +230,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             else:
                 for i in nfile:
                     self.createTab(i)
-            #This line sets the opened file to display Important not checked
+            #This line sets the opened file to display first Important not checked
             self.tabWidget.setCurrentIndex(len(self.files)-1)
 
 
@@ -280,7 +240,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         done = True
         if self.dirty[index]:
             reply = QMessageBox.question(self,
-                    "IDE - Unsaved Changes",
+                    "Sabel IDE - Unsaved Changes",
                     "Save unsaved changes?",
                     QMessageBox.Yes|QMessageBox.No|QMessageBox.Cancel)
             if reply == QMessageBox.Cancel:
@@ -292,7 +252,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             config.removeFile(self.files[index])
             self.files.remove(self.files[index])
             self.tabWidget.removeTab(index)
-        return True
+        #return True
 
     def setDirty(self,file):
         '''On change of text in textEdit window, set the flag
@@ -345,7 +305,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def help(self):
         QMessageBox.about(self, "About Simple Editor","This is The Help")
 
-    def openProject(self):
+    def newProject(self):
         fname = str(QFileDialog.getExistingDirectory(self,"Open File"))
         if not (fname == ""):
             fname = fname+"/"
@@ -368,16 +328,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def full(self):
         if not self.isFull:
-            self.setWindowFlags(Qt.Window | Qt.CustomizeWindowHint)
+            self.setWindowState(Qt.WindowFullScreen)
             self.isFull = True
         else:
-            self.setWindowFlags(Qt.Window)
+            self.setWindowState(Qt.WindowMaximized)
             self.isFull = False
+            
+    def cmd(self):
+        if(self.tabWidget_3.isHidden()):
+            self.tabWidget_3.show()
+        else:
+            self.tabWidget_3.hide()
 
     def options(self):
-        pass
-
-    def fileNew(self):
         pass
 
     def fileOpen(self):
@@ -430,9 +393,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 
     def closeEvent(self, event):
-        if(self.process.isOpen()):
-            self.process.kill()
-            self.process.close()
+        #check this ine adb.exe process is always on
+        self.aaa.close()
         for i in self.dirty:
             if i:
                 reply = QMessageBox.question(self,
@@ -443,70 +405,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     pass
                 elif reply == QMessageBox.Yes:
                     self.fileSaveAll()
-
-
-    def cmd(self):
-        if(self.tabWidget_3.isHidden()):
-            self.tabWidget_3.show()
-        else:
-            self.tabWidget_3.hide()
-
-
-    def runn(self):
-        self.CmdThread = myThread(self.run())
-        self.CmdThread.start()
-
-    def runFile(self):
-        if self.isRunning == False:
-            self.cmd()
-            self.process.start("python")
-
-
-    def run(self):
-        if self.isRunning == False:
-            if self.process.isOpen():
-                self.process.kill()
-            self.isRunning = True
-            self.action_Run.setDisabled(True)
-            self.action_Stop.setEnabled(True)
-            if(self.tabWidget_3.isHidden()):
-                self.tabWidget_3.show()
-            self.textEdit.clear()
-            self.tabWidget_3.setCurrentIndex(1)
-            #Running: C:/CODE/Tools/icons.py (Wed Aug 08 17:15:55 2012)
-            self.textEdit.append("Pushing main.nut\n")
-            self.process.start(adb[0])
-            self.process.waitForFinished()
-            self.process.kill()
-            self.textEdit.append("Starting Activity\n")
-            self.process.start(adb[1])
-            self.process.waitForFinished()
-            self.textEdit.append("Logging")
-            self.process.kill()
-            self.process.start(adb[2])
-
-    def stop(self):
-        if self.isRunning == True:
-            self.isRunning = False
-            self.action_Stop.setDisabled(True)
-            self.textEdit.append("Stopped")
-            self.process.kill()
-            self.process.start(adb[3])
-            self.process.waitForFinished()
-            self.process.kill()
-            if not(self.tabWidget_3.isHidden()):
-                self.tabWidget_3.hide()
-            self.action_Run.setEnabled(True)
-
-    def readOutput(self):
-        self.textEdit.append(QString(self.process.readAllStandardOutput()))
-        sb = self.textEdit.verticalScrollBar()
-        sb.setValue(sb.maximum())
-        # self.cmdText += self.textEdit.toPlainText()
-        # print self.cmdText
-    def readErrors(self):
-        self.textEdit_2.append("error: " + QString(self.process.readAllStandardError()))
-        
+    
     def findCurrentText(self):
         #print self.caseSensitive.isChecked()
         #print self.wholeWord.isChecked()

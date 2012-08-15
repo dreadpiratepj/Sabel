@@ -22,21 +22,20 @@ class Ui_MainWindow(object):
         self.tabWidget_3.setMaximumSize(16777215,200)
         self.tabWidget_3.setMinimumSize(0,75)
         self.tabWidget_3.setObjectName("tabWidget_3")
-        #bottom = QtGui.QFrame(self)
-        #bottom.setFrameShape(QtGui.QFrame.StyledPanel)
-        #bottom.setMaximumSize(16777215,200)
          
         #Tree
         self.tab_5 = QtGui.QWidget()
         self.tab_5.setObjectName("tab_5")
-        self.horizontalLayoutWidget_2 = QtGui.QWidget(self.tab_5)
-        self.horizontalLayoutWidget_2.setGeometry(QtCore.QRect(0, 9, 191, 601))
-        self.horizontalLayoutWidget_2.setObjectName("horizontalLayoutWidget_2")
-        self.horizontalLayout_3 = QtGui.QHBoxLayout(self.horizontalLayoutWidget_2)
+        self.tab_5.setMaximumSize(QtCore.QSize(200, 16777215))
+        self.horizontalLayout_3 = QtGui.QVBoxLayout(self.tab_5)#QHBoxLayout(self.tab_5)
         self.horizontalLayout_3.setMargin(0)
         self.horizontalLayout_3.setObjectName("horizontalLayout_3")
-        self.treeWidget = Tree(self.horizontalLayoutWidget_2)
+        self.treeWidget = Tree(self.tab_5)
         self.treeWidget.setObjectName("treeWidget")
+        self.treebar = QtGui.QToolBar()
+        action_Folder = QtGui.QAction(os_icon('newfolder_wiz'),'New Folder', self)
+        self.treebar.addAction(action_Folder)
+        self.horizontalLayout_3.addWidget(self.treebar)
         self.horizontalLayout_3.addWidget(self.treeWidget)
         
         
@@ -50,17 +49,14 @@ class Ui_MainWindow(object):
         self.textEdit = QtGui.QTextEdit(self.tab_6)
         self.textEdit.setObjectName("textEdit")
         self.horizontalLayout_2.addWidget(self.textEdit)
-          
+        
         #Error
         self.tab_7 = QtGui.QWidget()
         self.tab_7.setObjectName("tab_7")
-        self.horizontalLayoutWidget_4 = QtGui.QWidget(self.tab_7)
-        self.horizontalLayoutWidget_4.setGeometry(QtCore.QRect(0, -1, 16777215, 200))
-        self.horizontalLayoutWidget_4.setObjectName("horizontalLayoutWidget_4")
-        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.horizontalLayoutWidget_4)
+        self.horizontalLayout_4 = QtGui.QHBoxLayout(self.tab_7)
         self.horizontalLayout_4.setMargin(0)
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
-        self.textEdit_2 = QtGui.QTextEdit(self.horizontalLayoutWidget_4)
+        self.textEdit_2 = QtGui.QTextEdit(self.tab_7)
         self.textEdit_2.setObjectName("textEdit_2")
         self.horizontalLayout_4.addWidget(self.textEdit_2)
         
@@ -84,7 +80,6 @@ class Ui_MainWindow(object):
         self.replaceAll = QtGui.QPushButton(self.tab_8)
         self.replaceAll.setText("Replace All")
         self.replaceAll.clicked.connect(self.replaceAllText)
-        
         self.caseSensitive = QtGui.QToolButton(self.tab_8)
         self.caseSensitive.setText("cs")
         self.caseSensitive.setCheckable(True)
@@ -98,7 +93,6 @@ class Ui_MainWindow(object):
         self.backward.setText("bk")
         self.backward.setCheckable(True)
         self.backward.setDisabled(True)
-        
         self.horizontalLayout_5.addWidget(self.find)
         self.horizontalLayout_5.addWidget(self.lineEdit)
         self.horizontalLayout_5.addWidget(self.lineEdit_2)
@@ -116,11 +110,12 @@ class Ui_MainWindow(object):
         self.tabWidget_3.addTab(self.tab_7,"Error")
         self.tabWidget_3.addTab(self.tab_6,"Output")
         self.tabWidget_3.setTabIcon(0,os_icon("message_error"))
-        self.tabWidget_3.setTabIcon(1,os_icon("sample"))
+        self.tabWidget_3.setTabIcon(1,os_icon("monitor_obj"))
         
         #Splitters
         self.split1 = QtGui.QSplitter(QtCore.Qt.Horizontal)
         self.split1.addWidget(self.tabWidget)
+        #self.split1.addWidget(self.tab_5)
         self.split1.addWidget(self.tabWidget_2)
         self.split2 = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.split2.addWidget(self.split1)
@@ -135,7 +130,6 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.tabWidget.setCurrentIndex(-1)
-        self.tabWidget_2.setCurrentIndex(0)
         self.tab_8.hide()
         
         #Status

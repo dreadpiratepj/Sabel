@@ -1,5 +1,5 @@
 from PyQt4.QtGui import (QTreeWidgetItem,QTreeWidget,QMessageBox,
-                         QIcon,QDrag,QMenu,QAction,QInputDialog,QCursor)
+                         QIcon,QDrag,QMenu,QAction,QInputDialog,QCursor,QToolBar)
 from PyQt4.QtCore import SIGNAL,Qt,QMimeData
 from globals import (oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,
                      ospathbasename,os_icon,osremove,osrename,ospathdirname,
@@ -183,11 +183,13 @@ class Tree(QTreeWidget):
         action_Open.triggered.connect(lambda:self.openProject(item))
         action_Close = QAction('Close', self)
         action_Close.triggered.connect(lambda:self.closeProject(item))
+        action_Refresh = QAction('Refresh', self)
+        action_Refresh.triggered.connect(lambda:self.refreshProject(item))
         action_RenameProject = QAction('Rename Project', self)
         action_RenameProject.triggered.connect(lambda:self.renameProject(item))
         action_RenameDir = QAction('Rename Dir', self)
         action_RenameDir.triggered.connect(lambda:self.renameDir(item))
-        action_Rename = QAction('Rename', self)
+        action_Rename = QAction('Rename...', self)
         action_Rename.triggered.connect(lambda:self.rename(item))
         action_Delete = QAction(os_icon('trash'),'Delete', self)
         action_Delete.triggered.connect(lambda:self.delete(item))
@@ -201,6 +203,7 @@ class Tree(QTreeWidget):
                 menu.addAction(action_RenameProject)
                 menu.addAction(action_Delete)
                 menu.addSeparator()
+                menu.addAction(action_Refresh)
                 menu.addAction(action_Close)
             else:
                 menu.addAction(action_Open)
@@ -229,16 +232,6 @@ class Tree(QTreeWidget):
         self.takeTopLevelItem(self.indexOfTopLevelItem(item))
         self.addClosedProject(item.getPath()[0])
         
-        
-    def newFolder(self,item):
-        pass
-    def addFolder(self,item):
-        pass
-    def newFile(self,item):
-        pass
-    def addFile(self,item):
-        pass
-    
     def renameProject(self,item):
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
         if (ok and text != ''):
@@ -247,7 +240,36 @@ class Tree(QTreeWidget):
                 #print newname
                 osrename(item.getPath(),newname)
             except:
-                QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
+                QMessageBox.about(self,"Error","Could Not Rename The File")
+    
+    def refreshProject(self,item):
+        pass
+        
+        
+    def newFolder(self,item):
+        text,ok = QInputDialog.getText(self,"QInputDialog::getText()","Name:")
+        if (ok and text != ''):
+            fname = ospathdirname(item.getPath())
+            
+            try:
+                print fname+'/'+text
+                osmkdir(fname+'/'+text,0755)
+            except:
+                QMessageBox.about(self,"Error","Could Not Create The File")
+    def addFolder(self,item):
+        pass
+    def newFile(self,item):
+        text,ok = QInputDialog.getText(self,"QInputDialog::getText()","Name:")
+        if (ok and text != ''):
+            fname = ospathjoin(ospathdirname(item.getPath()),str(text))
+            try:
+                nfile = open(fname,'w')
+                nfile.close()
+            except:
+                QMessageBox.about(self,"Error","Could Not Create The File")
+        
+    def addFile(self,item):
+        pass
     
     def renameDir(self,item):
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
@@ -257,7 +279,7 @@ class Tree(QTreeWidget):
                 #print newname
                 osrename(item.getPath(),newname)
             except:
-                QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
+                QMessageBox.about(self,"Error","Could Not Rename The File")
         
     def rename(self,item):
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
@@ -267,7 +289,7 @@ class Tree(QTreeWidget):
                 #print newname
                 osrename(item.getPath(),newname)
             except:
-                QMessageBox.about(self,"Could Not Rename","Could Not Rename The File")
+                QMessageBox.about(self,"Error","Could Not Rename The File")
         
     def delete(self,item):
         reply = QMessageBox.question(self,
@@ -281,4 +303,4 @@ class Tree(QTreeWidget):
                 #print item.getPath()
                 recycle(item.getPath())
             except:
-                QMessa
+                QMessageBox.about(self,"Error","Could Not Delete The File")

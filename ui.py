@@ -9,7 +9,7 @@ from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      iconSize,iconDir)
 
 
-__version__ = "0.45"
+__version__ = "0.46"
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):

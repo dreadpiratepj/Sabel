@@ -45,7 +45,7 @@ class Adb(QWidget):
                 self.parent.tabWidget_3.setCurrentIndex(1)
             self.parent.textEdit.clear()
         self.parent.textEdit.append("Pushing main.nut\n")
-        self.adb_process = Popen(adblist[3], shell=False, stdout=PIPE,stderr=STDOUT)
+        self.adb_process = Popen(adblist[0], shell=False, stdout=PIPE,stderr=STDOUT)
         t = threading.Thread(target=self.output, args=(self.adb_process.stdout,))
         t.start()
         t.join()

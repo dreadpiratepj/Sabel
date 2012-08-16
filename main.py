@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.45"
+__version__ = "0.46"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
@@ -21,10 +21,9 @@ import icons_rc
 
 from Widget import Editor,PyInterp,Adb
 #from Dialog import *
-from adb import Adb
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,os_icon,config,workSpace,
-                     iconSize,iconDir)
+                     iconSize,iconDir,ospathexists)
 
 
 
@@ -35,7 +34,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
 	#Important must be empty this is a reference
         self.files = []
-        self.projects = []
+        self.projects = None
         self.recent = None
         self.dirty = None
         self.isFull = False
@@ -56,14 +55,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.projects = config.projects()
         self.recent = config.recent()
         self.dirty = []
-        self.createTab(config.files())
+        if(config.files() != None):
+            for i in config.files():
+                self.createTab(i)
         self.tabWidget.tabCloseRequested.connect(self.closeTab)
         self.treeWidget.itemDoubleClicked.connect(self.ss)
         
     def initProjects(self):
-        if len(self.projects) != 0:
-            for pro in self.projects:
-                self.treeWidget.addProject(pro)
+        if self.projects != None:
+            if len(self.projects) != 0:
+                for pro in self.projects:
+                    self.createProject(pro)
+          
+    #Important all projects must go through this          
+    def createProject(self,startDir):
+        if(ospathexists(startDir)): 
+            self.treeWidget.addProject(startDir)
+        else:
+            config.removeProject(startDir)
+            QMessageBox.about(self,"Can't Open Project","Project Does Not Exist %s"%startDir)
 
     def ss(self,item):
         if(item.isFile()):
@@ -79,30 +89,44 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def createTab(self,nfile):
         if(nfile != None):
-            if len(self.files) != 0:
-                for i in self.files:
-                    if(i == nfile):
-                        QMessageBox.about(self,"Can't Open","File Already Open\n"+nfile)
-                        return
+            if self.files != None:
+                if len(self.files) != 0:
+                    for i in self.files:
+                        if(i == nfile):
+                            QMessageBox.about(self,"Can't Open","File Already Open\n"+nfile)
+                            return
             if type(nfile) == str:
-                try:
-                    infile = open(nfile, 'r')
-                    config.addFile(nfile)
-                    self.files.append(nfile)
-                    self.dirty.append(False)
-                    tab = Editor(self,infile.read())
-                    self.tabWidget.addTab(tab,ospathbasename(nfile))
-                    tab.textChanged.connect(lambda:self.setDirty(nfile))
-                except:
-                    QMessageBox.about(self,"Can't Open","File Does Not Exist\n"+nfile)
+                if(ospathexists(nfile)):
+                    try:
+                        #print type(nfile)
+                        #print "file: "+nfile
+                        infile = open(nfile, 'r')
+                        self.files.append(nfile)
+                        config.addFile(nfile) 
+                        self.dirty.append(False)
+                        tab = Editor(self,infile.read())
+                        infile.close()
+                        self.tabWidget.addTab(tab,ospathbasename(nfile))
+                        tab.textChanged.connect(lambda:self.setDirty(nfile))
+                        #print len(self.files)
+                        if(self.files != None):
+                            if(len(self.files)) != 0:
+                                #This line sets the opened file to display first Important not checked
+                                self.tabWidget.setCurrentIndex(len(self.files)-1)
+                    except:
+                        config.removeFile(nfile)
+                        QMessageBox.about(self,"Can't Open","File Does Not Exist or Locked\n"+nfile)
+                else:
+                    #dont know must check this the last file is not removed executes only
+                    #twice when it has to remove 3 files
+                    #check sel.files 
+                    print len(config.files())
+                    config.removeFile(nfile)
+                    QMessageBox.about(self,"Can't Open","File Does Not Exist or Locked\n"+nfile) 
             else:
                 for i in nfile:
                     self.createTab(i)
-            #This line sets the opened file to display first Important not checked
-            self.tabWidget.setCurrentIndex(len(self.files)-1)
-
-
-
+            
     def closeTab(self,index):
         '''Boolean result invocation method.'''
         done = True
@@ -117,6 +141,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 done = self.fileSave(index)
 
         if(done):
+            #print index
             config.removeFile(self.files[index])
             self.files.remove(self.files[index])
             self.tabWidget.removeTab(index)
@@ -139,59 +164,65 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tabWidget.setTabText(index,flbase)
 
     def newProject(self):
-        fname = str(QFileDialog.getExistingDirectory(self,"Open File"))
+        fname = str(QFileDialog.getExistingDirectory(self,"Open Project Folder"))
         if not (fname == ""):
             fname = fname+"/"
             #print fname
-            for nfile in self.projects:
-                if(nfile != fname):
-                    self.createProjects(fname)
-                    config.addProject(fname)
-                    return
-                else:
-                    QMessageBox.about(self, "Already Open","Project Already Open\n"+fname)
-                    return
+            if self.projects != None:
+                for nfile in self.projects:
+                    if(nfile != fname):
+                        self.createProject(fname)
+                        config.addProject(fname)
+                        return
+                    else:
+                        QMessageBox.about(self, "Already Open","Project Already Open\n"+fname)
+                        return
+            else:
+                self.treeWidget.addProject(fname)
+                config.addProject(fname)     
         return
 
-    def syntax(self):
-        pass
-
-    def style(self):
-        pass
-            
-    def options(self):
-        pass
-
     def fileOpen(self):
-        '''Open file'''
         fname = str(QFileDialog.getOpenFileName(self,
                         "Open File", '.', "Files (*.*)"))
         if not (fname == ""):
-            for file in self.files:
-                if(file != fname):
-                    self.createTab(fname)
-                    self.files.append(fname)
-                    return
+            if self.files != None:
+                if len(self.files) != 0:
+                    for file in self.files:
+                        if(file != fname):
+                            self.createTab(fname)
+                            self.files.append(fname)
+                            return
+                        else:
+                            QMessageBox.about(self, "Already Open","File Already Open")
+                            return
                 else:
-                    QMessageBox.about(self, "Already Open","File Already Open")
-                    return
+                    self.createTab(fname)
+            else:
+                print "not"
+                #this is when the files list is empty and None type
+                if(self.files == None):
+                    self.files = []
+                self.createTab(fname)
         else:
             return
 
     def fileSave(self):
-        index = self.tabWidget.currentIndex()
-        if not self.dirty[index]:
-            return
-        fname = self.files[index]
-        fl = open(fname, 'w')
-        tempText = self.tabWidget.widget(index).text()
-        if tempText:
-            fl.write(tempText)
-            fl.close()
-            self.clearDirty(index)
-        else:
-            QMessageBox.about(self, "Can't Save","Failed to save ...")
-            self.statusBar().showMessage('Failed to save ...', 5000)
+        if(self.files != None):
+            if len(self.files) != 0:
+                index = self.tabWidget.currentIndex()
+                if not self.dirty[index]:
+                    return
+                fname = self.files[index]
+                fl = open(fname, 'w')
+                tempText = self.tabWidget.widget(index).text()
+                if tempText:
+                    fl.write(tempText)
+                    fl.close()
+                    self.clearDirty(index)
+                else:
+                    QMessageBox.about(self, "Can't Save","Failed to save ...")
+                    self.statusBar().showMessage('Failed to save ...', 5000)
 
     def fileSaveAll(self):
         def fileSaveIndex(index):
@@ -207,8 +238,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 else:
                     QMessageBox.about(self, "Can't Save","Failed to save ...")
                     self.statusBar().showMessage('Failed to save ...', 5000)
-        for file in self.files:
-            fileSaveIndex(self.files.index(file))
+        if(self.files != None):
+            if len(self.files) != 0:
+                for file in self.files:
+                    fileSaveIndex(self.files.index(file))
 
 
     def closeEvent(self, event):
@@ -224,6 +257,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     pass
                 elif reply == QMessageBox.Yes:
                     self.fileSaveAll()
+                    
+    def syntax(self):
+        pass
+
+    def style(self):
+        pass
+            
+    def options(self):
+        pass
         
 
 if __name__ == "__main__":

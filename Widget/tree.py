@@ -128,15 +128,12 @@ class Tree(QTreeWidget):
                 
                 
     def addProject(self,startDir):
-        if(ospathexists(startDir)): 
-            self.projects.append(startDir)
-            self.closed.append(False)
-            i = Project(self,startDir)
-            self.addTopLevelItem(i)
-            self.readDir(i,startDir)
-            self.readMainFiles(i,startDir)
-        else:
-            QMessageBox.about(self,"Can't Open Project","Project Does Not Exist %s"%startDir)
+        self.projects.append(startDir)
+        self.closed.append(False)
+        i = Project(self,startDir)
+        self.addTopLevelItem(i)
+        self.readDir(i,startDir)
+        self.readMainFiles(i,startDir)
             
     def addClosedProject(self,startDir):
         if(ospathexists(startDir)):

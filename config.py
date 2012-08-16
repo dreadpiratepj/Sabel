@@ -1,6 +1,6 @@
 import yaml
 import os
-
+from PyQt4.QtGui import QMessageBox
 class Config:
     def __init__(self):     
         self.configfile = 'config.yaml'
@@ -30,6 +30,12 @@ class Config:
     def files(self):
         return self.read('File')
     
+    def setfiles(self,files):
+        self.data['File'] = files
+        
+    def setProjects(self,pros):
+        self.data['Project'] = pros
+    
     def adb(self):
         return self.read('ADB')
     
@@ -37,23 +43,27 @@ class Config:
         #Python store reference to list so this points back to data
         #so awesome and weird
         #Must implement to add data not to rewrite data sad
-        for i in data:
-            if(i == nfile):
-                return False
+        if data != None:
+            for i in data:
+                if(i == nfile):
+                    return False
         return True
         
                        
     def addFile(self,nfile):
         files = self.files()
+        if(files == None):
+            files = []
         if(self.check(files,nfile)):
             if(os.path.exists(nfile)):
                 files.append(nfile)
+                self.setfiles(files)
                 try:
                     yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
                 except:
-                    print "cannot open config file"
+                    QMessageBox.about(self,"Can't Open","cannot open config file\n"+self.configfile) 
             else:
-                print "File Does not Exist"
+                QMessageBox.about(self,"Can't Open","File Does not Exist\n")
         else:
             #print "File is Already Saved" #need to fix this
             pass
@@ -65,27 +75,30 @@ class Config:
             try:
                 yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
             except:
-                print "cannot open config file"
+                QMessageBox.about(self,"Can't Open","cannot open config file\n"+self.configfile) 
                 
     def addProject(self,nfile):
         pros = self.projects()
+        if pros == None:
+            pros = []
         if(self.check(pros,nfile)):
             if(os.path.exists(nfile)):
                 pros.append(nfile)
+                self.setProjects(pros)
                 try:
                     yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
                 except:
-                    print "cannot open config file"
+                    QMessageBox.about(self,"Can't Open","cannot open config file\n"+self.configfile) 
             else:
-                "Folder Does not exist"
+                QMessageBox.about(self,"Can't Open","Folder Does not Exist\n")
         else:
             pass
                 
     def removeProject(self,nfile):
         pros = self.projects()
-        if(self.check(pros,nfile)):
+        if not(self.check(pros,nfile)):
             pros.remove(nfile)
             try:
                 yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
             except:
-                print "cannot open config file"
+                QMessageBox.about(self,"Can't Open","cannot open config file\n"+self.configfile) 

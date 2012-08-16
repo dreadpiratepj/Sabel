@@ -6,7 +6,6 @@ ADB:
   shell kill
 File:
 - C:/CODE/assets/main.nut
-- C:/CODE/assets/howtoscene.nut
 Project:
 - C:/CODE/assets/
 Recent:
@@ -15,4 +14,10 @@ Setting:
   fontname: Courier
   fontsize: 10
   iconsize: 16
+  style: 0
+  thresh: 1
   workspace: C:/CODE/
+Styles:
+  default:
+    bg: white
+    color: black

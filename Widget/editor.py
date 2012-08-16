@@ -1,21 +1,21 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs
-from globals import ospathjoin,workDir
+from globals import ospathjoin,workDir,fontSize,fontName
 
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
 
-    def __init__(self,fontSize=10,fontName='Courier',parent=None):
+    def __init__(self,parent,text):
         super(Editor, self).__init__(parent)
-        
-        
+        self.parent = parent
         font = QFont()
         font.setFamily(fontName)
         font.setFixedPitch(True)
         font.setPointSize(fontSize)
         self.setFont(font)
         self.setMarginsFont(font)
+        self.setText(text)
         #self.addAction(QAction("gg",self))
         #self.findFirst("function",False,True,True,True)
         #self.setEdgeColumn(70)
@@ -27,6 +27,7 @@ class Editor(QsciScintilla):
         self.setMarginWidth(0, fontmetrics.width("00000") + 6)
         self.setMarginLineNumbers(0, True)
         self.setMarginsBackgroundColor(QColor("#cccccc"))
+        
         # Clickable margin 1 for showing markers
         self.setMarginSensitivity(1, True)
         self.connect(self,SIGNAL('marginClicked(int, int, Qt::KeyboardModifiers)'),self.on_margin_clicked)

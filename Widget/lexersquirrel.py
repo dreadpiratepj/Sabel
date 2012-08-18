@@ -19,7 +19,7 @@ class LexerSquirrel(QsciLexerCustom):
         self.boldFont.setFamily("Courier New")
         self.boldFont.setBold(True)
         self.styles = [
-          QsciStyle(0, QString("base"), QColor("#000000"), QColor("#ffffff"), self.plainFont, False),
+          QsciStyle(0, QString("base"), QColor("#ffffff"), QColor("#000000"), self.plainFont, False),
           QsciStyle(1, QString("comment"), QColor("#008000"), QColor("#eeffee"), self.marginFont, True),
           QsciStyle(2, QString("keyword"), QColor("#000080"), QColor("#ffffff"), self.boldFont, True),
           QsciStyle(3, QString("string"), QColor("#800000"), QColor("#ffffff"), self.marginFont, True),
@@ -28,12 +28,46 @@ class LexerSquirrel(QsciLexerCustom):
           QsciStyle(6, QString("error"), QColor("#000000"), QColor("#ffd0d0"), self.plainFont, True),
         ]
         #print("LexerErlang created")
+        
+    def language(self):
+        return 'Squirrel'
+    
+    def foldCompact(self):
+        return self._foldcompact
+
+    def setFoldCompact(self, enable):
+        self._foldcompact = bool(enable)
 
     def description(self, ix):
         for i in self.styles:
           if i.style() == ix:
-            return QtCore.QString(i.description())
+            return i.description()
         return QtCore.QString("")
+    
+    def defaultColor(self, ix):
+        for i in self.styles:
+          if i.style() == ix:
+            return i.color()
+        return QsciLexerCustom.defaultColor(self, ix)
+
+    def defaultFont(self, ix):
+        for i in self.styles:
+          if i.style() == ix:
+            return i.font()
+        return QsciLexerCustom.defaultFont(self, ix)
+
+    def defaultPaper(self, ix):
+        for i in self.styles:
+          if i.style() == ix:
+            return i.paper()
+        return QsciLexerCustom.defaultPaper(self, ix)
+
+    def defaultEolFill(self, ix):
+        for i in self.styles:
+          if i.style() == ix:
+            return i.eolFill()
+        return QsciLexerCustom.defaultEolFill(self, ix)
+    
     def setEditor(self, sci):
         self.sci = sci
         Qsci.QsciLexerCustom.setEditor(self, sci)

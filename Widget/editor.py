@@ -335,10 +335,10 @@ class Editor(QsciScintilla):
         self.api.add("emo.Net.request?1(MY_REQUEST_NAME_BY_POST, 'http://www.example.com/','POST', 1000, 'key1', 'value1', 'key2', 'value2')")
         self.api.add("onNetCallback?1(name, response, err)")
         #Physics
-        self.api.add("_add")
-        self.api.add("_sub")               
-        self.api.add("_mul")
-        self.api.add("_div")
+        self.api.add("_add?1()")
+        self.api.add("_sub?1()")               
+        self.api.add("_mul?1()")
+        self.api.add("_div?1()")
         self.api.add("")
         self.api.add("")
 

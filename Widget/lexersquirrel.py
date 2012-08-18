@@ -5,7 +5,9 @@ from PyQt4.QtGui import *
 class LexerSquirrel(QsciLexerCustom):
     def __init__(self, parent = None):
         QsciLexerCustom.__init__(self, parent)
+        #self.parent = parent
         self.sci = None
+        #self.colorStyle = colorStyle
         self.plainFont = QFont()
         self.plainFont.setPointSize(10)
         self.plainFont.setFamily("Courier New")
@@ -17,7 +19,7 @@ class LexerSquirrel(QsciLexerCustom):
         self.boldFont.setFamily("Courier New")
         self.boldFont.setBold(True)
         self.styles = [
-          QsciStyle(0, QString("base"), QColor("#000000"), QColor("#ffffff"), self.plainFont, True),
+          QsciStyle(0, QString("base"), QColor("#000000"), QColor("#ffffff"), self.plainFont, False),
           QsciStyle(1, QString("comment"), QColor("#008000"), QColor("#eeffee"), self.marginFont, True),
           QsciStyle(2, QString("keyword"), QColor("#000080"), QColor("#ffffff"), self.boldFont, True),
           QsciStyle(3, QString("string"), QColor("#800000"), QColor("#ffffff"), self.marginFont, True),
@@ -25,7 +27,7 @@ class LexerSquirrel(QsciLexerCustom):
           QsciStyle(5, QString("macro"), QColor("#808000"), QColor("#ffffff"), self.boldFont, True),
           QsciStyle(6, QString("error"), QColor("#000000"), QColor("#ffd0d0"), self.plainFont, True),
         ]
-        print("LexerErlang created")
+        #print("LexerErlang created")
 
     def description(self, ix):
         for i in self.styles:
@@ -35,31 +37,31 @@ class LexerSquirrel(QsciLexerCustom):
     def setEditor(self, sci):
         self.sci = sci
         Qsci.QsciLexerCustom.setEditor(self, sci)
-        print("LexerErlang.setEditor()")
+        #print("LexerErlang.setEditor()")
     def styleText(self, start, end):
-        print("LexerErlang.styleText(%d,%d)" % (start, end))
+        #print("LexerErlang.styleText(%d,%d)" % (start, end))
         lines = self.getText(start, end)
         offset = start
         self.startStyling(offset, 0)
-        print("startStyling()")
+        #print("startStyling()")
         for i in lines:
           if i == "":
             self.setStyling(1, self.styles[0])
-            print("setStyling(1)")
+            #print("setStyling(1)")
             offset += 1
             continue
           if i[0] == '%':
             self.setStyling(len(i)+1, self.styles[1])
-            print("setStyling(%)")
+            #print("setStyling(%)")
             offset += len(i)+1
             continue
           self.setStyling(len(i)+1, self.styles[0])
-          print("setStyling(n)")
+          #print("setStyling(n)")
           offset += len(i)+1
 
     def getText(self, start, end):
         data = self.sci.text()
-        print("LexerErlang.getText(): " + str(len(data)) + " chars")
+        #print("LexerErlang.getText(): " + str(len(data)) + " chars")
         return data[start:end].split('\n')
 
 

@@ -2,7 +2,7 @@ from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
 from globals import ospathjoin,workDir,fontSize,fontName
-from LexerSquirrel import LexerSquirrel
+from lexersquirrel import LexerSquirrel
 
 
 class Style:
@@ -19,7 +19,7 @@ class Style:
         
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
-    def __init__(self,parent,text,styleIndex = 0,lang = 0):
+    def __init__(self,parent,text,styleIndex = 0,lang = 2):
         QsciScintilla.__init__(self,parent)
         self.parent = parent
         self.styleIndex = styleIndex
@@ -335,10 +335,10 @@ class Editor(QsciScintilla):
         self.api.add("emo.Net.request?1(MY_REQUEST_NAME_BY_POST, 'http://www.example.com/','POST', 1000, 'key1', 'value1', 'key2', 'value2')")
         self.api.add("onNetCallback?1(name, response, err)")
         #Physics
-        self.api.add("")
-        self.api.add("")               
-        self.api.add("")
-        self.api.add("")
+        self.api.add("_add")
+        self.api.add("_sub")               
+        self.api.add("_mul")
+        self.api.add("_div")
         self.api.add("")
         self.api.add("")
 

@@ -1,6 +1,6 @@
 from PyQt4.QtGui import (QTreeWidgetItem,QTreeWidget,QMessageBox,
                          QIcon,QDrag,QMenu,QAction,QInputDialog,QCursor,QToolBar)
-from PyQt4.QtCore import SIGNAL,Qt,QMimeData,QUrl
+from PyQt4.QtCore import SIGNAL,Qt,QMimeData,QUrl,QPoint
 from globals import (oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,
                      ospathbasename,os_icon,osremove,osrename,ospathdirname,
                      recycle,ospathnormpath,oswalk)
@@ -109,6 +109,13 @@ class Tree(QTreeWidget):
                 if not ospathjoin(d).startswith('.'):
                     i = Dir(parent,d,path)
                     self.readFiles(i,ospathjoin(path,d))
+                    
+    def readMainDir(self,parent,path):
+        for d in oslistdir(path):
+            if  ospathisdir(ospathjoin(path,d)):
+                if not ospathjoin(d).startswith('.'):
+                    i = Dir(parent,d,path)
+                    self.readMainFiles(i,ospathjoin(path,d))
         
     def readFiles(self,parent,path):
         for f in oslistdir(path):
@@ -199,7 +206,20 @@ class Tree(QTreeWidget):
         action_Open.triggered.connect(lambda:self.openProject(item))
         action_Close = QAction('Close', self)
         action_Close.triggered.connect(lambda:self.closeProject(item))
-        action_RefreshProject = QAction('Refresh', self)
+        
+        action_OpenFile = QAction(os_icon('__imp_obj'),'Open', self)
+        action_OpenFile.triggered.connect(lambda:self.openFile(item))
+        action_RunFile = QAction(os_icon('nav_go'),'Python Run', self)
+        action_RunFile.triggered.connect(lambda:self.runFile(item))
+        action_CopyFile = QAction(os_icon('file_obj'),'Copy', self)
+        action_CopyFile.triggered.connect(lambda:self.copyFile(item))
+        action_CopyDir = QAction(os_icon('file_obj'),'Copy', self)
+        action_CopyDir.triggered.connect(lambda:self.copyDir(item))
+        action_PasteFile = QAction(os_icon('paste_edit'),'Paste', self)
+        action_PasteFile.triggered.connect(lambda:self.pasteFile(item))
+        action_PasteDir = QAction(os_icon('paste_edit'),'Paste', self)
+        action_PasteDir.triggered.connect(lambda:self.pasteDir(item))
+        action_RefreshProject = QAction(os_icon('refresh_tab'),'Refresh', self)
         action_RefreshProject.triggered.connect(lambda:self.refreshProject(item))
         action_RemoveProject = QAction('Remove', self)
         action_RemoveProject.triggered.connect(lambda:self.removeProject(item))
@@ -233,11 +253,22 @@ class Tree(QTreeWidget):
                 menu.addAction(action_Folder)
                 menu.addAction(action_File)
                 menu.addSeparator()
+                menu.addAction(action_CopyDir)
+                menu.addAction(action_PasteDir)
                 menu.addAction(action_RenameDir)
                 menu.addAction(action_DeleteDir)      
             else:
-                menu.addAction(action_Rename)
-                menu.addAction(action_Delete)
+                menu1 = QMenu(self)
+                menu1.setTitle("Run As")
+                menu1.addAction(action_RunFile)
+                
+                menu.addAction(action_OpenFile)
+                menu.addMenu(menu1)
+                menu.addSeparator()
+                menu.addAction(action_CopyFile)
+                menu.addAction(action_PasteFile)
+                menu.addAction(action_RenameFile)
+                menu.addAction(action_DeleteFile)
                 
         menu.popup(QCursor.pos())
         
@@ -256,6 +287,17 @@ class Tree(QTreeWidget):
         itempath = item.getPath()
         self.takeTopLevelItem(self.indexOfTopLevelItem(item))
         self.addProject(itempath)
+        
+    def refreshAllProjects(self):
+        for pro in self.projects:
+            ind = self.projects.index(pro)
+            #self.takeTopLevelItem(ind)
+            if(self.closed[ind]):
+                print ind+pro
+                self.addClosedProject(pro)
+            else:
+                print ind+pro
+                self.addProject(pro)
         
     def removeProject(self,item):
         pass
@@ -282,16 +324,35 @@ class Tree(QTreeWidget):
             except:
                 QMessageBox.about(self,"Error","Could Not Create The File")
     
+    def openFile(self):
+        pass
+                
+    def runFile(self):
+        pass
+                
+    def copyFile(self):
+        pass
+    
+    def copyDir(self):
+        pass
+    
+    def pasteFile(self):
+        pass
+    
+    def pasteDir(self):
+        pass
+    
     def renameProject(self,item):
         itempath = item.getPath()
         text,ok = QInputDialog.getText(self,"QInputDialog::getText()","New Name:")
         if (ok and text != ''):
-            newname = ospathjoin(ospathdirname(itempath),str(text))
+            newname = ospathjoin(ospathdirname(itempath))
             try:
-                #print newname
-                osrename(itempath,newname)
-                self.takeTopLevelItem(self.indexOfTopLevelItem(item))
-                self.addProject(newname)
+                print itempath
+                print newname
+                #osrename(itempath,newname)
+                #self.takeTopLevelItem(self.indexOfTopLevelItem(item))
+                #self.addProject(newname)
             except:
                 QMessageBox.about(self,"Error","Could Not Rename The File")
     
@@ -301,11 +362,11 @@ class Tree(QTreeWidget):
         if (ok and text != ''):
             newname = ospathjoin(ospathdirname(itempath),str(text))
             try:
-                #print newname
+                print newname
                 osrename(itempath,newname)
                 p = item.parent()
                 p.removeChild(item)
-                self.readDir(p,ospathdirname(newname))
+                #self.refreshAllProjects()
             except:
                 QMessageBox.about(self,"Error","Could Not Rename The File")
         

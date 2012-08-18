@@ -72,39 +72,3 @@ class Tab(QTabWidget):
        
     def addItem(self,l):
         self.emit(SIGNAL("dropped"),l)
-        
-        
-class MyWindow(QtGui.QMainWindow):
-    def __init__(self):
-        QtGui.QMainWindow.__init__(self)
-        self.initUI()
-
-    def initUI(self):
-        self.centralwidget=QtGui.QWidget(self)
-        self.tabMain = Tab(self.centralwidget)
-        self.tabOne = QtGui.QWidget()
-        self.tabOne.edit = QtGui.QLineEdit(self.tabOne)
-        self.tabOne.edit.setText(QtCore.PYQT_VERSION_STR) #Qt Version
-        self.tabOneLayout = QtGui.QVBoxLayout(self.tabOne)
-        self.tabOneLayout.addWidget(self.tabOne.edit)
-        self.tabMain.addTab(self.tabOne, "First Tab")
-        self.verticalLayout = QtGui.QVBoxLayout(self.centralwidget)
-        self.verticalLayout.addWidget(self.tabMain)
-        self.setCentralWidget(self.centralwidget)
-        self.connect(self.tabMain, SIGNAL("dropped"), self.addg)
-        
-    def addg(self,l):
-        print l
-        
-        
-    
-
-if __name__ == '__main__':
-    app = QtGui.QApplication([])
-    frame = MyWindow()
-    frame.show()
-    app.exec_()
-
-    
-
-        

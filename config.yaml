@@ -19,7 +19,4 @@ Setting:
   style: 0
   thresh: 1
   workspace: C:/CODE/
-Styles:
-  default:
-    bg: white
-    color: black
+Style: 0

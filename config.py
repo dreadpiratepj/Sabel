@@ -20,6 +20,8 @@ class Config:
         return self.readSetting('fontname')
     def iconSize(self):
         return int(self.readSetting('iconsize'))
+    def colorStyle(self):
+        return int(self.readSetting('colorstyle'))
     
     def projects(self):
         return self.read('Project')

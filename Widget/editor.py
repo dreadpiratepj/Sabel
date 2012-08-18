@@ -1,5 +1,5 @@
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from PyQt4.QtCore import SIGNAL
+from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor,
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs
 from globals import ospathjoin,workDir,fontSize,fontName
 
@@ -61,6 +61,9 @@ class Editor(QsciScintilla):
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
         #self.setAutoCompletionSource(QsciScintilla.AcsAll)
         #self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
+        
+    def setColorStyle(self,styleIndex):
+        
         
 
     def code_complete(self):

@@ -28,6 +28,7 @@ workSpace = config.workSpace()
 fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
+colorStyle = config.colorStyle
 iconDir = ospathjoin(workDir,"Icons")
 adblist = config.adb()
 

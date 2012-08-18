@@ -1,6 +1,7 @@
 from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QHBoxLayout,QVBoxLayout,QTabWidget,QToolBar,QTextEdit,
-                         QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar)
+                         QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar,
+                         QMainWindow)              
 from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR
 from Widget import Tab,Tree
 
@@ -9,13 +10,16 @@ from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      iconSize,iconDir)
 
 
-__version__ = "0.46"
+__version__ = "0.47"
 
-class Ui_MainWindow(object):
-    def setupUi(self, MainWindow):
-        MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(758, 673)
-        self.centralwidget = QWidget(MainWindow)
+class Window(QMainWindow):
+    def __init__(self,parent = None):
+        QMainWindow.__init__(self,parent)
+        self.setObjectName("self")
+        self.resize(758, 673)
+        self.setWindowTitle("Sabel")
+        self.setWindowIcon(os_icon("sample"))
+        self.centralwidget = QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -145,7 +149,7 @@ class Ui_MainWindow(object):
         
         
         #Status
-        self.statusbar = QStatusBar(MainWindow)
+        self.statusbar = QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
         self.cmdButton = QPushButton(self)
         self.cmdButton.setFlat(True)
@@ -164,8 +168,8 @@ class Ui_MainWindow(object):
         self.statusbar.setFixedHeight(18)
         
         #Init
-        MainWindow.setCentralWidget(self.centralwidget)
-        MainWindow.setStatusBar(self.statusbar)
+        self.setCentralWidget(self.centralwidget)
+        self.setStatusBar(self.statusbar)
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.setTabShape(0)
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))

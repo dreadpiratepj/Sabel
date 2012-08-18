@@ -1,37 +1,35 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.46"
+__version__ = "0.47"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
+
+
 
 #TODO:
 #Add options for all GUI
 #Add Project Options
 #Add error markers
 
-from PyQt4.QtGui import (QMainWindow,QApplication,QPixmap,QSplashScreen,QMessageBox,
+from PyQt4.QtGui import (QApplication,QPixmap,QSplashScreen,QMessageBox,
                          QIcon,QAction,QCheckBox,QFileDialog)
 from PyQt4.QtCore import SIGNAL,Qt,QStringList,QString
                         
 
-from ui import Ui_MainWindow
-import icons_rc
 
+import icons_rc
+from window import Window
 from Widget import Editor,PyInterp,Adb
-#from Dialog import *
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,os_icon,config,workSpace,
                      iconSize,iconDir,ospathexists)
 
 
-
-
-class MainWindow(QMainWindow, Ui_MainWindow):
-    def __init__(self, parent=None):
-        QMainWindow.__init__(self,parent)
-        self.setupUi(self)
+class MainWindow(Window):
+    def __init__(self, parent = None):
+        Window.__init__(self,parent)
 	#Important must be empty this is a reference
         self.files = []
         self.projects = None
@@ -39,8 +37,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.dirty = None
         self.isFull = False
         self.adb = Adb(self)
-        self.setWindowTitle("Sabel")
-        self.setWindowIcon(os_icon("sample"))
         self.init()
 
     def init(self):
@@ -48,7 +44,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initToolBar()
         self.initProjects()
         self.connect(self, SIGNAL('triggered()'), self.closeEvent)
-        self.connect(self.tabWidget,SIGNAL("dropped"), self.createTab)
+        self.connect(self.tabWidget,SIGNAL("dropped"), self.createTabs)
         #self.initInterpreter()
 
     def initConfig(self):
@@ -93,7 +89,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if len(self.files) != 0:
                     for i in self.files:
                         if(i == nfile):
-                            QMessageBox.about(self,"Can't Open","File Already Open\n"+nfile)
+                            #print "File Already Open\n"+nfile
+                            self.tabWidget.setCurrentIndex(self.files.index(nfile))
                             return
             if type(nfile) == str:
                 if(ospathexists(nfile)):
@@ -120,12 +117,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     #dont know must check this the last file is not removed executes only
                     #twice when it has to remove 3 files
                     #check sel.files 
-                    print len(config.files())
+                    #print len(config.files())
                     config.removeFile(nfile)
                     QMessageBox.about(self,"Can't Open","File Does Not Exist or Locked\n"+nfile) 
-            else:
-                for i in nfile:
-                    self.createTab(i)
+                           
+    def createTabs(self,link):
+        for i in link:
+            self.createTab(i)
             
     def closeTab(self,index):
         '''Boolean result invocation method.'''
@@ -139,7 +137,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 done = False
             elif reply == QMessageBox.Yes:
                 done = self.fileSave(index)
-
+            elif reply == QMessageBox.No:
+                self.clearDirty(index)
+                done = True
         if(done):
             #print index
             config.removeFile(self.files[index])

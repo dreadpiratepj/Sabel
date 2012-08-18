@@ -3,36 +3,40 @@ from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor,
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs
 from globals import ospathjoin,workDir,fontSize,fontName
 
-class Editor(QsciScintilla):
-    ARROW_MARKER_NUM = 8
 
-    def __init__(self,parent,text):
-        super(Editor, self).__init__(parent)
-        self.parent = parent
-        font = QFont()
-        font.setFamily(fontName)
-        font.setFixedPitch(True)
-        font.setPointSize(fontSize)
-        self.setFont(font)
+class Style:
+    def __init__(self):
+        self.font = QColor('#000000')
+        self.paper = QColor('#FFFFFF')
+        self.caret = QColor('#FFFFFF')
+        self.marker = QColor('#ffe4e4')
+        self.margin = QColor('#cccccc')
+        self.font = QFont()
+        self.font.setFamily(fontName)
+        self.font.setFixedPitch(True)
+        self.font.setPointSize(fontSize)
+        
         self.setMarginsFont(font)
         self.setText(text)
+
+
+class Editor(QsciScintilla):
+    ARROW_MARKER_NUM = 8
+    def __init__(self,parent,text,styleIndex = 0):
+        QsciScintilla.__init__(self,parent)
+        self.parent = parent
+        self.styleIndex = styleIndex
+        self.colorSyle = None
+        
         #self.addAction(QAction("gg",self))
         #self.findFirst("function",False,True,True,True)
         #self.setEdgeColumn(70)
         #self.setEdgeColor(QColor(0,0,0))
-        #self.setEdgeMode(self.EDGE_LINE)
-        # Margin 0 is used for line numbers
-        fontmetrics = QFontMetrics(font)
-        self.setMarginsFont(font)
-        self.setMarginWidth(0, fontmetrics.width("00000") + 6)
-        self.setMarginLineNumbers(0, True)
-        self.setMarginsBackgroundColor(QColor("#cccccc"))
-        
+        #self.setEdgeMode(self.EDGE_LINE)           
         # Clickable margin 1 for showing markers
         self.setMarginSensitivity(1, True)
         self.connect(self,SIGNAL('marginClicked(int, int, Qt::KeyboardModifiers)'),self.on_margin_clicked)
         self.markerDefine(QsciScintilla.RightArrow,self.ARROW_MARKER_NUM)
-        self.setMarkerBackgroundColor(QColor("#ee1111"),self.ARROW_MARKER_NUM)
         self.registerImage(0,QPixmap(":/Icons/class_obj.gif"))
         self.registerImage(1,QPixmap(":/Icons/method_obj.gif"))
         self.registerImage(2,QPixmap(":/Icons/field_public_obj.gif"))
@@ -45,8 +49,6 @@ class Editor(QsciScintilla):
 
         # Current line visible with special background color
         self.setCaretLineVisible(True)
-        self.setCaretLineBackgroundColor(QColor("#ffe4e4"))
-        
         
         self.lexer = QsciLexerPython()
         #print ospathjoin(workDir,"emo.api")
@@ -62,7 +64,25 @@ class Editor(QsciScintilla):
         #self.setAutoCompletionSource(QsciScintilla.AcsAll)
         #self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
         
+    def init(self):
+        self.setColorStyle(self.styleIndex)
+        self.font = self.colorSyle.font
+        self.setFont(self.font)
+        self.fontmetrics = QFontMetrics(self.font)
+        self.setMarginsFont(self.font)
+        self.setMarginWidth(0, self.fontmetrics.width("00000") + 6)
+        # Margin 0 is used for line numbers
+        self.setMarginLineNumbers(0, True)
+        
     def setColorStyle(self,styleIndex):
+        if styleIndex == 0:
+            self.colorSyle = Style()
+        elif styleIndex == 1:
+            self.colorSyle = Style1()
+        self.setCaretLineBackgroundColor()
+        self.setMarginsBackgroundColor()
+        self.setMarkerBackgroundColor(QColor("#ee1111"),self.ARROW_MARKER_NUM)
+            
         
         
 

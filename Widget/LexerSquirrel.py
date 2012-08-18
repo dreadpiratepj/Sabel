@@ -12,9 +12,9 @@ from PyQt4.QtGui import *
 #prefs.declare('font.size.code', 10)
 #prefs.declare('color.editline', "#d0e0ff")
 
-class QsciLexerSquirrel(QsciLexerCustom):
-    def __init__(self, obj=None):
-        QsciLexerCustom.__init__(self, obj)
+class LexerSquirrel(QsciLexerCustom):
+    def __init__(self, parent = None):
+        QsciLexerCustom.__init__(self, parent)
         self.sci = None
         self.plainFont = QFont()
         self.plainFont.setPointSize(10)

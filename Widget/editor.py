@@ -1,5 +1,5 @@
 from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor,
+from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs
 from globals import ospathjoin,workDir,fontSize,fontName
 
@@ -8,25 +8,23 @@ class Style:
     def __init__(self):
         self.font = QColor('#000000')
         self.paper = QColor('#FFFFFF')
-        self.caret = QColor('#FFFFFF')
-        self.marker = QColor('#ffe4e4')
+        self.caret = QColor('#ffe4e4')
+        self.marker = QColor('#ee1111')
         self.margin = QColor('#cccccc')
         self.font = QFont()
         self.font.setFamily(fontName)
         self.font.setFixedPitch(True)
         self.font.setPointSize(fontSize)
         
-        self.setMarginsFont(font)
-        self.setText(text)
-
-
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
     def __init__(self,parent,text,styleIndex = 0):
         QsciScintilla.__init__(self,parent)
         self.parent = parent
         self.styleIndex = styleIndex
-        self.colorSyle = None
+        self.colorStyle = None
+        self.init()
+        self.setText(text)
         
         #self.addAction(QAction("gg",self))
         #self.findFirst("function",False,True,True,True)
@@ -43,20 +41,14 @@ class Editor(QsciScintilla):
 
         # Brace matching: enable for a brace immediately before or after
         # the current position
-        #
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        
-
-        # Current line visible with special background color
-        self.setCaretLineVisible(True)
-        
         self.lexer = QsciLexerPython()
         #print ospathjoin(workDir,"emo.api")
         self.api = QsciAPIs(self.lexer)
         #api.load(ospathjoin(workDir,"emo.api"))
         self.code_complete()
         self.api.prepare()
-        self.lexer.setDefaultFont(font)
+        self.lexer.setDefaultFont(self.font)
         self.setLexer(self.lexer) #Very important do not change line otherwise gg
         
         self.setAutoCompletionThreshold(1)
@@ -66,26 +58,25 @@ class Editor(QsciScintilla):
         
     def init(self):
         self.setColorStyle(self.styleIndex)
-        self.font = self.colorSyle.font
+        self.font = self.colorStyle.font
         self.setFont(self.font)
         self.fontmetrics = QFontMetrics(self.font)
         self.setMarginsFont(self.font)
         self.setMarginWidth(0, self.fontmetrics.width("00000") + 6)
         # Margin 0 is used for line numbers
         self.setMarginLineNumbers(0, True)
+        self.setCaretLineVisible(True)
+        
         
     def setColorStyle(self,styleIndex):
         if styleIndex == 0:
-            self.colorSyle = Style()
+            self.colorStyle = Style()
         elif styleIndex == 1:
-            self.colorSyle = Style1()
-        self.setCaretLineBackgroundColor()
-        self.setMarginsBackgroundColor()
-        self.setMarkerBackgroundColor(QColor("#ee1111"),self.ARROW_MARKER_NUM)
+            self.colorStyle = Style()
+        self.setCaretLineBackgroundColor(self.colorStyle.caret)
+        self.setMarginsBackgroundColor(self.colorStyle.margin)
+        self.setMarkerBackgroundColor(self.colorStyle.marker,self.ARROW_MARKER_NUM)
             
-        
-        
-
     def code_complete(self):
         self.api.add("emo.Runtime?0(use = runtime)")
         self.api.add("runtime.import?1(filename)")

@@ -3,6 +3,7 @@ from PyQt4.QtCore import SIGNAL, SLOT, QString,QStringList
 from PyQt4.QtGui import QApplication, QMainWindow, QColor, QFont
 from PyQt4.Qsci import QsciScintilla, QsciLexerCustom, QsciStyle
 
+from editor import Editor
 _sample = """
 This example shows how to highlight some specific lines or words.
 
@@ -125,7 +126,7 @@ class MainWindow(QMainWindow):
         QMainWindow.__init__(self)
         self.setWindowTitle('Custom Lexer For Config Files')
         self.setGeometry(50, 200, 400, 400)
-        self.editor = QsciScintilla(self)
+        self.editor = Editor(self,_sample)
         self.editor.setUtf8(True)
 
 # LINES' NUMBER IN THE MARGIN
@@ -137,7 +138,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.editor)
         self.lexer = ConfigLexer(self.editor)
         self.editor.setLexer(self.lexer)
-        self.editor.setText(_sample)
+        #self.editor.setText(_sample)
 
 
 class ConfigLexer(QsciLexerCustom):

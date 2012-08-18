@@ -6,8 +6,6 @@ __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
 
-
-
 #TODO:
 #Add options for all GUI
 #Add Project Options

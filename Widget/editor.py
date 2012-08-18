@@ -1,7 +1,8 @@
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor
-from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs
+from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
 from globals import ospathjoin,workDir,fontSize,fontName
+from LexerSquirrel import LexerSquirrel
 
 
 class Style:
@@ -18,14 +19,14 @@ class Style:
         
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
-    def __init__(self,parent,text,styleIndex = 0):
+    def __init__(self,parent,text,styleIndex = 0,lang = 0):
         QsciScintilla.__init__(self,parent)
         self.parent = parent
         self.styleIndex = styleIndex
+        self.lang = lang
         self.colorStyle = None
         self.init()
         self.setText(text)
-        
         #self.addAction(QAction("gg",self))
         #self.findFirst("function",False,True,True,True)
         #self.setEdgeColumn(70)
@@ -38,17 +39,15 @@ class Editor(QsciScintilla):
         self.registerImage(0,QPixmap(":/Icons/class_obj.gif"))
         self.registerImage(1,QPixmap(":/Icons/method_obj.gif"))
         self.registerImage(2,QPixmap(":/Icons/field_public_obj.gif"))
-
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        self.lexer = QsciLexerPython()
+        
         #print ospathjoin(workDir,"emo.api")
         self.api = QsciAPIs(self.lexer)
         #api.load(ospathjoin(workDir,"emo.api"))
         self.code_complete()
         self.api.prepare()
-        self.lexer.setDefaultFont(self.font)
         self.setLexer(self.lexer) #Very important do not change line otherwise gg
         
         self.setAutoCompletionThreshold(1)
@@ -62,10 +61,17 @@ class Editor(QsciScintilla):
         self.setFont(self.font)
         self.fontmetrics = QFontMetrics(self.font)
         self.setMarginsFont(self.font)
-        self.setMarginWidth(0, self.fontmetrics.width("00000") + 6)
+        self.setMarginWidth(0, self.fontmetrics.width("000") + 6)
         # Margin 0 is used for line numbers
         self.setMarginLineNumbers(0, True)
         self.setCaretLineVisible(True)
+        if self.lang == 0:
+            self.lexer = QsciLexerPython()
+        elif self.lang == 1:
+            self.lexer = QsciLexerCPP()
+        elif self.lang == 2:
+            self.lexer = LexerSquirrel()
+        self.lexer.setDefaultFont(self.font)
         
         
     def setColorStyle(self,styleIndex):

@@ -2,16 +2,6 @@ from PyQt4.Qsci import QsciLexerCustom,QsciStyle
 from PyQt4.QtCore import QString
 from PyQt4.QtGui import *
 
-#class QsciLexerSquirrel(QsciLexer):
-
-#    def __init__(self):
-#        pass
-#prefs.declare('font.name.margin', "MS Dlg")
-#prefs.declare('font.size.margin', 8)
-#prefs.declare('font.name.code', "Courier New")
-#prefs.declare('font.size.code', 10)
-#prefs.declare('color.editline', "#d0e0ff")
-
 class LexerSquirrel(QsciLexerCustom):
     def __init__(self, parent = None):
         QsciLexerCustom.__init__(self, parent)

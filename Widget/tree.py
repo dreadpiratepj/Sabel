@@ -23,6 +23,7 @@ class Dir(QTreeWidgetItem):
         return False
 
 class File(QTreeWidgetItem):
+    ext = [".txt",".nut",".py",".cpp",".c",".h"]
     def __init__(self,parent,name,path):
         QTreeWidgetItem.__init__(self,parent)
         self.path = ospathjoin(path,name)
@@ -39,9 +40,13 @@ class File(QTreeWidgetItem):
         
         
     def Doc(self,name):
-        if(name.endswith(".txt") or name.endswith(".nut") or name.endswith(".py")):
-            self.setIcon(0,os_icon("file_obj"))
-            self.doc = True
+        for e in self.ext:
+            if name.endswith(e):
+                self.setIcon(0,os_icon("file_obj"))
+                self.doc = True
+        #if(name.endswith(".txt") or name.endswith(".nut") or name.endswith(".py")):
+        #    self.setIcon(0,os_icon("file_obj"))
+        #    self.doc = True
             
     def Pic(self,name):
         if(name.endswith(".png") or name.endswith(".gif") or name.endswith(".jpg")):

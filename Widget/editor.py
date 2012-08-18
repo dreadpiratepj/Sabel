@@ -4,10 +4,9 @@ from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
 from globals import ospathjoin,workDir,fontSize,fontName
 from lexersquirrel import LexerSquirrel
 
-
 class Style:
     def __init__(self):
-        self.font = QColor('#000000')
+        self.color = QColor('#000000')
         self.paper = QColor('#FFFFFF')
         self.caret = QColor('#ffe4e4')
         self.marker = QColor('#ee1111')
@@ -19,7 +18,7 @@ class Style:
         
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
-    def __init__(self,parent,text,styleIndex = 0,lang = 2):
+    def __init__(self,parent,text,lang = 2,styleIndex = 0):
         QsciScintilla.__init__(self,parent)
         self.parent = parent
         self.styleIndex = styleIndex
@@ -70,7 +69,7 @@ class Editor(QsciScintilla):
         elif self.lang == 1:
             self.lexer = QsciLexerCPP()
         elif self.lang == 2:
-            self.lexer = LexerSquirrel()
+            self.lexer = LexerSquirrel(self.colorStyle,self)
         self.lexer.setDefaultFont(self.font)
         
         

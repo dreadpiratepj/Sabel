@@ -1,16 +1,14 @@
 from PyQt4.Qsci import QsciLexerCustom,QsciStyle
 from PyQt4.QtCore import QString
-from PyQt4.QtGui import *
+from PyQt4.QtGui import QFont, QColor
 
 class LexerSquirrel(QsciLexerCustom):
-    def __init__(self, parent = None):
+    def __init__(self,colorStyle, parent = None):
         QsciLexerCustom.__init__(self, parent)
-        #self.parent = parent
-        self.sci = None
-        #self.colorStyle = colorStyle
-        self.plainFont = QFont()
-        self.plainFont.setPointSize(10)
-        self.plainFont.setFamily("Courier New")
+        self.parent = parent
+        self.sci = self.parent
+        self.colorStyle = colorStyle
+        self.plainFont = self.colorStyle.font
         self.marginFont = QFont()
         self.marginFont.setPointSize(10)
         self.marginFont.setFamily("MS Dlg")
@@ -19,15 +17,19 @@ class LexerSquirrel(QsciLexerCustom):
         self.boldFont.setFamily("Courier New")
         self.boldFont.setBold(True)
         self.styles = [
-          QsciStyle(0, QString("base"), QColor("#ffffff"), QColor("#000000"), self.plainFont, False),
+          #index description color paper font eol
+          QsciStyle(0, QString("base"), self.colorStyle.color, self.colorStyle.paper, self.plainFont, True),
           QsciStyle(1, QString("comment"), QColor("#008000"), QColor("#eeffee"), self.marginFont, True),
-          QsciStyle(2, QString("keyword"), QColor("#000080"), QColor("#ffffff"), self.boldFont, True),
+          QsciStyle(2, QString("keyword"), QColor("#000080"), QColor("#ffffff"), self.boldFont, False),
           QsciStyle(3, QString("string"), QColor("#800000"), QColor("#ffffff"), self.marginFont, True),
           QsciStyle(4, QString("atom"), QColor("#008080"), QColor("#ffffff"), self.plainFont, True),
           QsciStyle(5, QString("macro"), QColor("#808000"), QColor("#ffffff"), self.boldFont, True),
           QsciStyle(6, QString("error"), QColor("#000000"), QColor("#ffd0d0"), self.plainFont, True),
         ]
         #print("LexerErlang created")
+        
+    def setColorStyle(self,cs):
+        self.colorStyle = cs
         
     def language(self):
         return 'Squirrel'
@@ -42,7 +44,7 @@ class LexerSquirrel(QsciLexerCustom):
         for i in self.styles:
           if i.style() == ix:
             return i.description()
-        return QtCore.QString("")
+        return QString("")
     
     def defaultColor(self, ix):
         for i in self.styles:
@@ -68,10 +70,6 @@ class LexerSquirrel(QsciLexerCustom):
             return i.eolFill()
         return QsciLexerCustom.defaultEolFill(self, ix)
     
-    def setEditor(self, sci):
-        self.sci = sci
-        Qsci.QsciLexerCustom.setEditor(self, sci)
-        #print("LexerErlang.setEditor()")
     def styleText(self, start, end):
         #print("LexerErlang.styleText(%d,%d)" % (start, end))
         lines = self.getText(start, end)
@@ -79,19 +77,28 @@ class LexerSquirrel(QsciLexerCustom):
         self.startStyling(offset, 0)
         #print("startStyling()")
         for i in lines:
+          length = len(i)
           if i == "":
             self.setStyling(1, self.styles[0])
             #print("setStyling(1)")
             offset += 1
             continue
-          if i[0] == '%':
-            self.setStyling(len(i)+1, self.styles[1])
-            #print("setStyling(%)")
-            offset += len(i)+1
+          if i == '#':
+            self.setStyling(1, self.styles[2])
+            offset += 1
             continue
-          self.setStyling(len(i)+1, self.styles[0])
+          if i == 'g':
+            self.setStyling(1, self.styles[3])
+            offset += 1
+            continue
+          if i[0] == '%':
+            self.setStyling(length+1, self.styles[1])
+            #print("setStyling(%)")
+            offset += length+1
+            continue
+          self.setStyling(length+1, self.styles[0])
           #print("setStyling(n)")
-          offset += len(i)+1
+          offset += length+1
 
     def getText(self, start, end):
         data = self.sci.text()

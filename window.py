@@ -10,7 +10,7 @@ from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      iconSize,iconDir)
 
 
-__version__ = "0.47"
+__version__ = "0.48"
 
 class Window(QMainWindow):
     def __init__(self,parent = None):
@@ -220,27 +220,23 @@ class Window(QMainWindow):
         self.action_Todo = QAction(os_icon('task_set'), 'Todo', self)
         #self.action_Todo.triggered.connect(self.stop)
         #Only variation CHeck Later
+        
+        men = QMenu()
+        men.addAction(QAction("Ident",self))
+        men.addAction(QAction("Edit",self))
+        men.addAction(QAction("Paste",self))
+        men.addAction(QAction("Tabs",self))
         self.action_Options = QAction(QIcon(":/{0}.png".format("Icons"+ospathsep+'emblem-system')), 'Options', self)
+        self.action_Options.setMenu(men)
         self.action_Options.triggered.connect(self.options)
         self.action_Full = QAction(os_icon('task_set'), 'Full', self)
         self.action_Full.setShortcut('Shift+Enter')
         self.action_Full.triggered.connect(self.full)
 
-        self.action_Syntax = QAction(os_icon('task_set'), 'Syntax', self)
-        men = QMenu()#public_co.gif
         #chkBox =QCheckBox(men)
         #chkBox.setText("MyCheckBox")
-        chkBoxAction=QWidgetAction(men)
+        #chkBoxAction=QWidgetAction(men)
         #chkBoxAction.setDefaultWidget(QPixmap(":/Icons/public_co"))
-        men.addAction(chkBoxAction)
-
-        men.addAction(QAction("C",self))
-        men.addAction(QAction("C++",self))
-        men.addAction(QAction("Lua",self))
-        men.addAction(QAction("Squirrel",self))
-        self.action_Syntax.setMenu(men)
-
-
 
         self.action_Style = QAction(os_icon('welcome16'), 'Style', self)
         self.action_Style.triggered.connect(self.style)
@@ -283,7 +279,6 @@ class Window(QMainWindow):
         self.toolbar.addAction(self.action_Design)
         self.toolbar.addAction(self.action_Todo)
         self.toolbar.addAction(self.action_Options)
-        self.toolbar.addAction(self.action_Syntax)
         self.toolbar.addAction(self.action_Style)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.action_Help)

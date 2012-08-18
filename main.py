@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.47"
+__version__ = "0.48"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
@@ -15,8 +15,6 @@ from PyQt4.QtGui import (QApplication,QPixmap,QSplashScreen,QMessageBox,
                          QIcon,QAction,QCheckBox,QFileDialog)
 from PyQt4.QtCore import SIGNAL,Qt,QStringList,QString
                         
-
-
 import icons_rc
 from window import Window
 from Widget import Editor,PyInterp,Adb
@@ -93,13 +91,11 @@ class MainWindow(Window):
             if type(nfile) == str:
                 if(ospathexists(nfile)):
                     try:
-                        #print type(nfile)
-                        #print "file: "+nfile
                         infile = open(nfile, 'r')
                         self.files.append(nfile)
                         config.addFile(nfile) 
                         self.dirty.append(False)
-                        tab = Editor(self,infile.read())
+                        tab = Editor(self,infile.read(),self.syntax(nfile))
                         infile.close()
                         self.tabWidget.addTab(tab,ospathbasename(nfile))
                         tab.textChanged.connect(lambda:self.setDirty(nfile))
@@ -189,7 +185,6 @@ class MainWindow(Window):
                     for file in self.files:
                         if(file != fname):
                             self.createTab(fname)
-                            self.files.append(fname)
                             return
                         else:
                             QMessageBox.about(self, "Already Open","File Already Open")
@@ -256,8 +251,14 @@ class MainWindow(Window):
                 elif reply == QMessageBox.Yes:
                     self.fileSaveAll()
                     
-    def syntax(self):
-        pass
+    def syntax(self,nfile):
+        if nfile.endswith(".py"):
+            lang = 0
+        elif (nfile.endswith(".cpp") or nfile.endswith(".h") or nfile.endswith(".c")):
+            lang = 1
+        elif nfile.endswith(".nut"):
+            lang = 0
+        return lang
 
     def style(self):
         pass

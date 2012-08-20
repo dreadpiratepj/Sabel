@@ -90,23 +90,26 @@ class MainWindow(Window):
                             return
             if type(nfile) == str:
                 if(ospathexists(nfile)):
+                    text = ""
                     try:
                         infile = open(nfile, 'r')
-                        self.files.append(nfile)
+                        text = infile.read()
+                        infile.close()
                         config.addFile(nfile) 
                         self.dirty.append(False)
-                        tab = Editor(self,infile.read(),self.syntax(nfile))
-                        infile.close()
-                        self.tabWidget.addTab(tab,ospathbasename(nfile))
-                        tab.textChanged.connect(lambda:self.setDirty(nfile))
+                        self.files.append(nfile)
                         #print len(self.files)
-                        if(self.files != None):
-                            if(len(self.files)) != 0:
-                                #This line sets the opened file to display first Important not checked
-                                self.tabWidget.setCurrentIndex(len(self.files)-1)
                     except:
                         config.removeFile(nfile)
                         QMessageBox.about(self,"Can't Open","File Does Not Exist or Locked\n"+nfile)
+                    
+                    tab = Editor(self,text,self.syntax(nfile)) 
+                    self.tabWidget.addTab(tab,ospathbasename(nfile))
+                    tab.textChanged.connect(lambda:self.setDirty(nfile)) 
+                    if(self.files != None):
+                        if(len(self.files)) != 0:
+                            #This line sets the opened file to display first Important not checked
+                            self.tabWidget.setCurrentIndex(len(self.files)-1)
                 else:
                     #dont know must check this the last file is not removed executes only
                     #twice when it has to remove 3 files
@@ -240,15 +243,18 @@ class MainWindow(Window):
     def closeEvent(self, event):
         #check this ine adb.exe process is always on
         self.adb.close()
-        for i in self.dirty:
-            if i:
-                reply = QMessageBox.question(self,
+        notSaved = False
+        for files in self.dirty:
+            if files == True:
+                notSaved = True
+        if notSaved:
+            reply = QMessageBox.question(self,
                                              "Simple Editor - Unsaved Changes",
                                              "Save unsaved changes?",
                                              QMessageBox.Yes|QMessageBox.No|QMessageBox.Cancel)
-                if reply == QMessageBox.Cancel:
+            if reply == QMessageBox.Cancel:
                     pass
-                elif reply == QMessageBox.Yes:
+            elif reply == QMessageBox.Yes:
                     self.fileSaveAll()
                     
     def syntax(self,nfile):

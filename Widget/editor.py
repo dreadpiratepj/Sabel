@@ -1,7 +1,7 @@
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
-from globals import ospathjoin,fontSize,fontName,workDir
+from globals import ospathjoin,fontSize,fontName,os_pixmap,apiDir
 from lexersquirrel import LexerSquirrel
 
 class Style:
@@ -35,9 +35,9 @@ class Editor(QsciScintilla):
         self.setMarginSensitivity(1, True)
         self.connect(self,SIGNAL('marginClicked(int, int, Qt::KeyboardModifiers)'),self.on_margin_clicked)
         self.markerDefine(QsciScintilla.RightArrow,self.ARROW_MARKER_NUM)
-        self.registerImage(0,QPixmap(":/Icons/class_obj.gif"))
-        self.registerImage(1,QPixmap(":/Icons/method_obj.gif"))
-        self.registerImage(2,QPixmap(":/Icons/field_public_obj.gif"))
+        self.registerImage(0,os_pixmap("class_obj"))
+        self.registerImage(1,os_pixmap("method_obj"))
+        self.registerImage(2,os_pixmap("field_public_obj"))
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
@@ -64,7 +64,7 @@ class Editor(QsciScintilla):
             self.lexer = LexerSquirrel(self.colorStyle,self)
         self.lexer.setDefaultFont(self.font)
         self.api = QsciAPIs(self.lexer)
-        self.api.load(ospathjoin(workDir,"api","emo.api"))
+        self.api.load(ospathjoin(apiDir,"emo.api"))
         self.api.prepare()
         self.lexer.setAPIs(self.api) #Very important do not change line otherwise gg
         self.setLexer(self.lexer) #Very important do not change line otherwise gg

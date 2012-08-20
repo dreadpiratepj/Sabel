@@ -5,8 +5,11 @@ ADB:
 - adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb
   shell kill
 File:
-- C:/CODE/assetsdd/common.nut
-- C:/CODE/assetsdd/howtoscene.nut
+- C:/CODE/assetsdd/logoscene.nut
+- C:/CODE/assetsdd/main.nut
+- C:/CODE/assetsdd/creditscene.nut
+- C:/CODE/assetsdd/titlescene.nut
+- C:/CODE/assetsdd/Engine.cpp
 Project:
 - C:/CODE/data/
 - C:/CODE/assetsdd/

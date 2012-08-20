@@ -1,6 +1,7 @@
 import os
 from platform import system,python_version
 from PyQt4.QtGui import QIcon,QPixmap
+from PyQt4.Qsci import QsciAPIs
 from send2trash import send2trash
 from config import Config
 
@@ -21,8 +22,8 @@ ossep = os.sep
 OS_NAME = system()
 
 workDir = os.getcwd()
-apiDir = "api"+ossep
-iconDir = ospathjoin(workDir,"Icons")
+apiDir = ospathjoin(workDir,"api")
+iconDir = ospathjoin("Icons")
 
 
 recycle = send2trash
@@ -37,8 +38,6 @@ colorStyle = config.colorStyle
 adblist = config.adb()
 
 def os_icon(name):
-        return QIcon(":/{0}.gif".format("Icons"+ossep+name))
+        return QIcon(":/{0}.gif".format(ospathjoin(iconDir,name)))
 def os_pixmap(name):
-        return QPixmap(":/{0}.gif".format("Icons"+ossep+name))
-def getApi(name):
-        return QPixmap(":/{0}.gif".format("Icons"+ossep+name))
+        return QPixmap(":/{0}.gif".format(ospathjoin(iconDir,name)))

@@ -59,6 +59,17 @@ class Window(QMainWindow):
         self.VerticalLayout_2.addWidget(self.treebar)
         self.VerticalLayout_2.addWidget(self.treeWidget)
         
+        #Outline
+        self.tab_2 = QWidget()
+        self.tab_2.setObjectName("tab_2")
+        self.tab_2.setMaximumWidth(200)
+        self.VerticalLayout_3 = QVBoxLayout(self.tab_2)
+        self.VerticalLayout_3.setMargin(0)
+        self.VerticalLayout_3.setObjectName("VerticalLayout_3")
+        self.outlineWidget = Tree(self.tab_2)
+        self.outlineWidget.setObjectName("outlineWidget")
+        self.VerticalLayout_3.addWidget(self.outlineWidget)
+        
         #Output
         self.tab_6 = QWidget()
         self.tab_6.setObjectName("tab_6")
@@ -130,10 +141,13 @@ class Window(QMainWindow):
         
         
         self.tabWidget_2.addTab(self.tab_5,"Projects")
+        self.tabWidget_2.addTab(self.tab_2,"Outline")
         self.tabWidget_3.addTab(self.tab_7,"Error")
         self.tabWidget_3.addTab(self.tab_6,"Output")
         self.tabWidget_3.setTabIcon(0,os_icon("message_error"))
         self.tabWidget_3.setTabIcon(1,os_icon("monitor_obj"))
+        self.tabWidget.setTabsClosable(True)
+        self.tabWidget.setTabShape(0)
         
         
         #Splitters
@@ -156,22 +170,23 @@ class Window(QMainWindow):
         self.cmdButton.setIcon(os_icon('monitor_obj'))
         self.cmdButton.clicked.connect(self.cmd)
         self.cmdButton.setShortcut('Ctrl+O')
-        #self.cmdButton.setToolTip("Opens Console Ctrl+O")
         self.findButton = QPushButton(self)
         self.findButton.setFlat(True)
         self.findButton.setIcon(os_icon('find_obj'))
         self.findButton.setShortcut("Ctrl+F")
-        #self.findButton.setToolTip("Opens Find Bar Ctrl+F")
         self.findButton.clicked.connect(self.findBarShow)
+        self.aboutButton = QPushButton(self)
+        self.aboutButton.setFlat(True)
+        self.aboutButton.setIcon(os_icon('find_obj'))
+        self.aboutButton.clicked.connect(self.about)
         self.statusbar.addWidget(self.cmdButton)
         self.statusbar.addWidget(self.findButton)
+        self.statusbar.addWidget(self.aboutButton)
         self.statusbar.setFixedHeight(18)
         
         #Init
         self.setCentralWidget(self.centralwidget)
         self.setStatusBar(self.statusbar)
-        self.tabWidget.setTabsClosable(True)
-        self.tabWidget.setTabShape(0)
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
         
     def findBarShow(self):

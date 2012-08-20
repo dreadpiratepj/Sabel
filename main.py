@@ -14,13 +14,12 @@ __email__ = 'pyros2097@gmail.com'
 from PyQt4.QtGui import (QApplication,QPixmap,QSplashScreen,QMessageBox,
                          QIcon,QAction,QCheckBox,QFileDialog)
 from PyQt4.QtCore import SIGNAL,Qt,QStringList,QString
-                        
 import icons_rc
 from window import Window
 from Widget import Editor,PyInterp,Adb
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,os_icon,config,workSpace,
-                     iconSize,iconDir,ospathexists)
+                     iconSize,iconDir,ospathexists,os_pixmap)
 
 
 class MainWindow(Window):
@@ -258,6 +257,7 @@ class MainWindow(Window):
                     self.fileSaveAll()
                     
     def syntax(self,nfile):
+        lang = 0
         if nfile.endswith(".py"):
             lang = 0
         elif (nfile.endswith(".cpp") or nfile.endswith(".h") or nfile.endswith(".c")):
@@ -275,11 +275,11 @@ class MainWindow(Window):
 
 if __name__ == "__main__":
     app = QApplication([])
-    splash_pix = QPixmap(':/Icons/logo.gif')
+    splash_pix = os_pixmap('logo')
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()
-    #app.processEvents()
+    app.processEvents()
     # Simulate something that takes time
     frame = MainWindow()
     frame.showMaximized()

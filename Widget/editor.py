@@ -1,20 +1,12 @@
+from globals import ospathjoin,os_pixmap,apiDir
+
 from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
-from globals import ospathjoin,fontSize,fontName,os_pixmap,apiDir
 from lexersquirrel import LexerSquirrel
+from style import Style
 
-class Style:
-    def __init__(self):
-        self.color = QColor('#000000')
-        self.paper = QColor('#FFFFFF')
-        self.caret = QColor('#ffe4e4')
-        self.marker = QColor('#ee1111')
-        self.margin = QColor('#cccccc')
-        self.font = QFont()
-        self.font.setFamily(fontName)
-        self.font.setFixedPitch(True)
-        self.font.setPointSize(fontSize)
+
         
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8

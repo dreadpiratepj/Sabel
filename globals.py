@@ -34,6 +34,7 @@ workSpace = config.workSpace()
 fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
+styleIndex = config.styleIndex()
 colorStyle = config.colorStyle
 adblist = config.adb()
 

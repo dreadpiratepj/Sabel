@@ -7,7 +7,7 @@ from Widget import Tab,Tree
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,os_icon,config,workSpace,
-                     iconSize,iconDir)
+                     iconSize,iconDir,styleIndex)
 
 
 __version__ = "0.48"
@@ -23,6 +23,7 @@ class Window(QMainWindow):
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.styleIndex = styleIndex
         
         #TabWidgets
         self.tab_1 = QWidget(self)
@@ -177,7 +178,7 @@ class Window(QMainWindow):
         self.findButton.clicked.connect(self.findBarShow)
         self.aboutButton = QPushButton(self)
         self.aboutButton.setFlat(True)
-        self.aboutButton.setIcon(os_icon('find_obj'))
+        self.aboutButton.setIcon(os_icon('alert_obj'))
         self.aboutButton.clicked.connect(self.about)
         self.statusbar.addWidget(self.cmdButton)
         self.statusbar.addWidget(self.findButton)
@@ -221,8 +222,6 @@ class Window(QMainWindow):
         self.action_SaveAll.setStatusTip("Save All Files")
         self.action_Help = QAction(os_icon('toc_open'), 'Help', self)
         self.action_Help.triggered.connect(self.help)
-        self.action_About = QAction(os_icon('alert_obj'), 'About', self)
-        self.action_About.triggered.connect(self.about)
         self.action_Run = QAction(os_icon('lrun_obj'), 'Run', self)
         self.action_Run.setShortcut('Ctrl+R')
         self.action_Run.triggered.connect(self.adb.run)
@@ -252,27 +251,49 @@ class Window(QMainWindow):
         #chkBox.setText("MyCheckBox")
         #chkBoxAction=QWidgetAction(men)
         #chkBoxAction.setDefaultWidget(QPixmap(":/Icons/public_co"))
-
         self.action_Style = QAction(os_icon('welcome16'), 'Style', self)
-        self.action_Style.triggered.connect(self.style)
         men1 = QMenu()
-        men1.addAction(QAction("All Hallow's Eve",self))
-        men1.addAction(QAction("Amy",self))
-        men1.addAction(QAction("Aptana Studio",self))
-        men1.addAction(QAction("Bespin",self))
-        men1.addAction(QAction("Blackboard",self))
-        men1.addAction(QAction("Choco",self))
-        men1.addAction(QAction("Cobalt",self))
-        men1.addAction(QAction("Dawn",self))
-        men1.addAction(QAction("Eclipse",self))
-        men1.addAction(QAction("IDLE",self))
-        men1.addAction(QAction("Mac Classic",self))
-        men1.addAction(QAction("Monokai",self))
-        men1.addAction(QAction("Monokai Dark",self))
-        men1.addAction(QAction("Pastels on Dark",self))
-        men1.addAction(QAction("Sunburst",self))
-        men1.addAction(QAction("Twilight",self))
+        self.styleslist = []
+        self.style1 = QAction("All Hallow's Eve",self)
+        self.style1.triggered.connect(lambda:self.style_clicked(1))
+        self.style1.setCheckable(True)
+        self.style2 = QAction("Amy",self)
+        self.style2.triggered.connect(lambda:self.style_clicked(2))
+        self.style2.setCheckable(True)
+        self.style3 = QAction("Aptana Studio",self)
+        self.style3.triggered.connect(lambda:self.style_clicked(3))
+        self.style3.setCheckable(True)
+        self.style4 = QAction("Bespin",self)
+        self.style4.triggered.connect(lambda:self.style_clicked(4))
+        self.style4.setCheckable(True)
+        self.style5 = QAction("Blackboard",self)
+        self.style5.triggered.connect(lambda:self.style_clicked(5))
+        self.style5.setCheckable(True)
+        self.style6 = QAction("Choco",self)
+        self.style6.triggered.connect(lambda:self.style_clicked(6))
+        self.style6.setCheckable(True)
+        self.style7 = QAction("Cobalt",self)
+        self.style7.triggered.connect(lambda:self.style_clicked(7))
+        self.style7.setCheckable(True)
+        self.style8 = QAction("Dawn",self)
+        self.style8.triggered.connect(lambda:self.style_clicked(8))
+        self.style8.setCheckable(True)
+        self.style9 = QAction("Eclipse",self)
+        self.style9.triggered.connect(lambda:self.style_clicked(9))
+        self.style9.setCheckable(True)
+        self.styleslist.append(self.style1)
+        self.styleslist.append(self.style2)
+        self.styleslist.append(self.style3)
+        self.styleslist.append(self.style4)
+        self.styleslist.append(self.style5)
+        self.styleslist.append(self.style6)
+        self.styleslist.append(self.style7)
+        self.styleslist.append(self.style8)
+        self.styleslist.append(self.style9)
+        men1.addActions(self.styleslist)
         self.action_Style.setMenu(men1)
+        self.styleslist[self.styleIndex-1].setChecked(True)
+        #men1.triggered.connect(lambda:self.style_clicked(men1.childEvent()))
 
 
 
@@ -297,7 +318,6 @@ class Window(QMainWindow):
         self.toolbar.addAction(self.action_Style)
         self.toolbar.addSeparator()
         self.toolbar.addAction(self.action_Help)
-        self.toolbar.addAction(self.action_About)
         self.toolbar.addAction(self.action_Full)
         
     def about(self):
@@ -366,3 +386,12 @@ class Window(QMainWindow):
         edt = self.tabWidget.widget(self.tabWidget.currentIndex())
         while(edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())):
             edt.replaceText(self.lineEdit_2.text())
+    
+    def style_clicked(self,no):
+        self.styleIndex = no
+        for i in self.styleslist:
+            if self.styleslist.index(i) == self.styleIndex-1:
+                i.setChecked(True)
+            else:
+                i.setChecked(False)
+        config.setstyleIndex(self.styleIndex)

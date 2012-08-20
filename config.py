@@ -12,6 +12,9 @@ class Config:
     def readSetting(self,section):
         return self.data["Setting"][section]
     
+    def writeSetting(self,section,value):
+        self.data["Setting"][section] = value
+    
     def workSpace(self):
         return self.readSetting("workspace")
     def fontSize(self):
@@ -40,6 +43,19 @@ class Config:
     
     def adb(self):
         return self.read('ADB')
+    
+    def styleIndex(self):
+        return self.readSetting('styleindex')
+    
+    def setstyleIndex(self,value):
+        self.writeSetting("styleindex",value)
+        self.write()
+    
+    def write(self):
+        try:
+            yaml.dump(self.data,open(self.configfile,'w'),default_flow_style=False)
+        except:
+            QMessageBox.about(self,"Can't Open","cannot open config file\n"+self.configfile) 
     
     def check(self,data,nfile):
         #Python store reference to list so this points back to data

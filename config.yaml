@@ -17,7 +17,7 @@ Setting:
   fontname: Courier New
   fontsize: 10
   iconsize: 16
-  style: 0
+  styleindex: 7
   thresh: 1
   workspace: C:/CODE/
 Style: 0

@@ -3,6 +3,35 @@ from PyQt4.QtCore import QString
 from PyQt4.QtGui import QFont, QColor
 
 class LexerSquirrel(QsciLexerCustom):
+    words1 = [
+         'base','break','case','catch','class','clone',
+         'continue','const','default','delete','else','enum',
+         'extends','for','foreach','function','if','in',
+         'local','null','resume','return','switch','this',
+         'throw','try','typeof','while','yield','constructor',
+         'instanceof','true','false','static'
+        ]
+        
+    words2 = [
+         'init', 'dest', 'onLoad', 'onDispose', 'onGainedFocus','onMotionEvent',
+         'onLostFocus','onUpdate','onFps','onKeyEvent','onSensorEvent',
+         'onControlEvent','onDrawFrame','onError','onLowMemory','onNetCallBack'
+        ]
+
+    words3 = [
+        'rawdelete', 'rawin', 'array', 'seterrorhandler', 'setdebughook',
+        'enabledebuginfo', 'getroottable', 'setroottable', 'getconsttable',
+        'setconsttable', 'assert', 'print', 'compilestring', 'collectgarbage',
+        'type', 'getstackinfos', 'newthread', 'tofloat', 'tostring',
+        'tointeger', 'tochar', 'weakref', 'slice', 'find', 'tolower',
+        'toupper', 'len', 'rawget', 'rawset', 'clear', 'append', 'push',
+        'extend', 'pop', 'top', 'insert', 'remove', 'resize', 'sort',
+        'reverse', 'call', 'pcall', 'acall', 'pacall', 'bindenv', 'instance',
+        'getattributes', 'getclass', 'getstatus', 'ref'
+        ]
+        
+    words4 = [
+         ]
     def __init__(self,colorStyle, parent = None):
         QsciLexerCustom.__init__(self, parent)
         self.parent = parent

@@ -3,7 +3,6 @@ from PyQt4.QtCore import SIGNAL, SLOT, QString,QStringList
 from PyQt4.QtGui import QApplication, QMainWindow, QColor, QFont
 from PyQt4.Qsci import QsciScintilla, QsciLexerCustom, QsciStyle
 
-from editor import Editor
 _sample = """
 This example shows how to highlight some specific lines or words.
 
@@ -121,25 +120,6 @@ class CreditScene {
 }
 
 """
-class MainWindow(QMainWindow):
-    def __init__(self):
-        QMainWindow.__init__(self)
-        self.setWindowTitle('Custom Lexer For Config Files')
-        self.setGeometry(50, 200, 400, 400)
-        self.editor = Editor(self,_sample)
-        self.editor.setUtf8(True)
-
-# LINES' NUMBER IN THE MARGIN
-        self.editor.setMarginLineNumbers(1,True)
-        self.editor.setMarginWidth(1, QString("-------"))
-                # OK for 3 digits. This was found by direct tests...
-# WRAPING
-        self.editor.setWrapMode(True)
-        self.setCentralWidget(self.editor)
-        self.lexer = ConfigLexer(self.editor)
-        self.editor.setLexer(self.lexer)
-        #self.editor.setText(_sample)
-
 
 class ConfigLexer(QsciLexerCustom):
     def __init__(self, parent):
@@ -157,38 +137,6 @@ class ConfigLexer(QsciLexerCustom):
             }
         for key,value in self._styles.iteritems():
             setattr(self, value, key)
-            
-        self.words1 = [
-         'base','break','case','catch','class','clone',
-         'continue','const','default','delete','else','enum',
-         'extends','for','foreach','function','if','in',
-         'local','null','resume','return','switch','this',
-         'throw','try','typeof','while','yield','constructor',
-         'instanceof','true','false','static'
-        ]
-        
-        self.words2 = [
-         'init', 'dest', 'onLoad', 'onDispose', 'onGainedFocus','onMotionEvent',
-         'onLostFocus','onUpdate','onFps','onKeyEvent','onSensorEvent',
-         'onControlEvent','onDrawFrame','onError','onLowMemory','onNetCallBack'
-        ]
-
-        self.words3 = [
-        'rawdelete', 'rawin', 'array', 'seterrorhandler', 'setdebughook',
-        'enabledebuginfo', 'getroottable', 'setroottable', 'getconsttable',
-        'setconsttable', 'assert', 'print', 'compilestring', 'collectgarbage',
-        'type', 'getstackinfos', 'newthread', 'tofloat', 'tostring',
-        'tointeger', 'tochar', 'weakref', 'slice', 'find', 'tolower',
-        'toupper', 'len', 'rawget', 'rawset', 'clear', 'append', 'push',
-        'extend', 'pop', 'top', 'insert', 'remove', 'resize', 'sort',
-        'reverse', 'call', 'pcall', 'acall', 'pacall', 'bindenv', 'instance',
-        'getattributes', 'getclass', 'getstatus', 'ref'
-        ]
-        
-        self.words4 = [
-         ]
-
-       
 
     def language(self):
         return 'Squirrel'
@@ -294,24 +242,15 @@ class ConfigLexer(QsciLexerCustom):
                     self.startStyling(i + pos, 0x1f)
 
                     if chr(line[i]) in '0123456789':
-                        #newState = self.Digits
-                        pass
+                        newState = self.Digits
                     else:
                         newState = self.gett(line[i:])
                         wordLength = 5
                         if line[i:].startswith("class"):
                                 newState = self.KeyWord2
                                 wordLength = len('class')
-                        elif line[i:].startswith('function'):
-                                newState = self.KeyWord2
-                                wordLength = len('function')
-                        elif line[i:].startswith('null'):
-                                newState = self.KeyWord2
-                                wordLength = len('null')
                         else:
                                 newState = self.Default
-                                
-
                     i += wordLength
                     set_style(wordLength, newState)
                 newState = None
@@ -320,7 +259,26 @@ class ConfigLexer(QsciLexerCustom):
                 set_style(length, newState)
 
             index += 1
-        
+    
+    
+class MainWindow(QMainWindow):
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setWindowTitle('Custom Lexer For Config Files')
+        self.setGeometry(50, 200, 400, 400)
+        self.editor = QsciScintilla(self)
+        self.editor.setUtf8(True)
+
+# LINES' NUMBER IN THE MARGIN
+        self.editor.setMarginLineNumbers(1,True)
+        self.editor.setMarginWidth(1, QString("-------"))
+                # OK for 3 digits. This was found by direct tests...
+# WRAPING
+        self.editor.setWrapMode(True)
+        self.setCentralWidget(self.editor)
+        self.lexer = ConfigLexer(self.editor)
+        self.editor.setLexer(self.lexer)
+        self.editor.setText(_sample)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

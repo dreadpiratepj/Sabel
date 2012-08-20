@@ -14,7 +14,7 @@ class MyTabBar(QTabBar):
     def __init__(self,parent):
         QTabBar.__init__(self,parent)
         self.setAcceptDrops(True)
-
+        
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls:
             event.accept()
@@ -45,7 +45,7 @@ class Tab(QTabWidget):
         self.setTabBar(MyTabBar(self))
         self.setAcceptDrops(True)
         self.connect(self.tabBar(), SIGNAL("dropped"), self.addItem)
-        
+
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls:
             event.accept()

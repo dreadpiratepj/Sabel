@@ -2,16 +2,16 @@ from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QHBoxLayout,QVBoxLayout,QTabWidget,QToolBar,QTextEdit,
                          QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar,
                          QMainWindow,QPalette,QColor)              
-from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR
+from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR,QStringList
 from Widget import Tab,Tree
 from Widget.style import *
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
-                     OS_NAME,PY_VERSION,os_icon,config,workSpace,
+                     OS_NAME,PY_VERSION,__version__,os_icon,config,workSpace,
                      iconSize,iconDir,styleIndex)
 
 
-__version__ = "0.48"
+
 
 class Window(QMainWindow):
     def __init__(self,parent = None):
@@ -24,6 +24,7 @@ class Window(QMainWindow):
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
+        self.horizontalLayout.setMargin(0)
         self.styleIndex = styleIndex
         #TabWidgets
         self.tab_1 = QWidget(self)
@@ -154,9 +155,10 @@ class Window(QMainWindow):
         
         #Splitters
         self.split1 = QSplitter(Qt.Horizontal)
+        self.split1.addWidget(self.tabWidget_2)
         self.split1.addWidget(self.tab_1)
         #self.split1.addWidget(self.tab_5)
-        self.split1.addWidget(self.tabWidget_2)
+        
         self.split2 = QSplitter(Qt.Vertical)
         self.split2.addWidget(self.split1)
         self.split2.addWidget(self.tabWidget_3)
@@ -192,6 +194,7 @@ class Window(QMainWindow):
         #Init
         self.setCentralWidget(self.centralwidget)
         self.setStatusBar(self.statusbar)
+        self
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
         
     def findBarShow(self):
@@ -203,11 +206,13 @@ class Window(QMainWindow):
     def initColorStyle(self):
         self.colorStyle = self.checkColorStyle(self.styleIndex)
         pal = QPalette(self.tabWidget_2.palette())
+        #print pal.color(QPalette.Base).name()
+        #print pal.color(QPalette.Window).name()
         pal.setColor(QPalette.Base,self.colorStyle.paper)
         pal.setColor(QPalette.Text,self.colorStyle.color)
         self.tabWidget_2.setPalette(pal)
         self.tabWidget_3.setPalette(pal)
-    
+
     def initToolBar(self):
         self.action_NewProject = QAction(os_icon('newprj_wiz'), 'Project', self)
         self.action_NewProject.setShortcut('Ctrl+P')
@@ -312,6 +317,7 @@ class Window(QMainWindow):
         self.toolbar.setIconSize(QSize(16,16))
         self.setToolButtonStyle(Qt.ToolButtonTextUnderIcon)
         self.toolbar.setAllowedAreas(Qt.AllToolBarAreas)
+        #self.toolbar.setFixedHeight(40)
 
         self.toolbar.addAction(self.action_NewProject)
         self.toolbar.addAction(self.action_Open)

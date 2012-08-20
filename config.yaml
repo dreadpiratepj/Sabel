@@ -6,7 +6,9 @@ ADB:
   shell kill
 File:
 - C:/CODE/assets/creditscene.nut
-- C:/CODE/assets/main.nut
+- C:/CODE/assets/common.nut
+- C:/CODE/assets/runtime.nut
+- C:/CODE/assets/Engine.h
 Project:
 - C:/CODE/data/
 - C:/CODE/assets/
@@ -16,7 +18,7 @@ Setting:
   fontname: Courier New
   fontsize: 10
   iconsize: 16
-  styleindex: 0
+  styleindex: 5
   thresh: 1
   workspace: C:/CODE/
 Style: 0

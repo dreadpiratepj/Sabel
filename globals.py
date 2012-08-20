@@ -1,9 +1,21 @@
+#!/usr/bin/env python
+__author__ = "pyros2097"
+__license__ = "GPLv3"
+__version__ = "0.48"
+__copyright__ = 'Copyright (c) 2012, pyros2097'
+__credits__ = ['pyros2097', 'eclipse']
+__email__ = 'pyros2097@gmail.com'
+__version__ = "0.48"
+
+
 import os
 from platform import system,python_version
 from PyQt4.QtGui import QIcon,QPixmap
 from PyQt4.Qsci import QsciAPIs
 from send2trash import send2trash
 from config import Config
+
+
 
 #Python accesses local variables much more efficiently than global variables. 
 oslistdir = os.listdir
@@ -35,7 +47,6 @@ fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
 styleIndex = config.styleIndex()
-colorStyle = config.colorStyle
 adblist = config.adb()
 
 def os_icon(name):

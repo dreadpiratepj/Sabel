@@ -1,6 +1,7 @@
 from PyQt4.Qsci import QsciLexerCustom,QsciStyle
 from PyQt4.QtCore import QString
 from PyQt4.QtGui import QFont, QColor
+from globals import fontName, fontSize
 
 class LexerSquirrel(QsciLexerCustom):
     words1 = [
@@ -37,7 +38,10 @@ class LexerSquirrel(QsciLexerCustom):
         self.parent = parent
         self.sci = self.parent
         self.colorStyle = colorStyle
-        self.plainFont = self.colorStyle.font
+        self.plainFont = QFont()
+        self.plainFont.setFamily(fontName)
+        self.plainFont.setFixedPitch(True)
+        self.plainFont.setPointSize(fontSize)
         self.marginFont = QFont()
         self.marginFont.setPointSize(10)
         self.marginFont.setFamily("MS Dlg")

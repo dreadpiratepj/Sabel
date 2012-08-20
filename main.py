@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-__author__ = "pyros2097"
-__license__ = "GPLv3"
-__version__ = "0.48"
-__copyright__ = 'Copyright (c) 2012, pyros2097'
-__credits__ = ['pyros2097', 'eclipse']
-__email__ = 'pyros2097@gmail.com'
-
 #TODO:
 #Add options for all GUI
 #Add Project Options
@@ -18,7 +10,7 @@ import icons_rc
 from window import Window
 from Widget import Editor,PyInterp,Adb
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
-                     OS_NAME,PY_VERSION,os_icon,config,workSpace,
+                     OS_NAME,os_icon,config,workSpace,
                      iconSize,iconDir,ospathexists,os_pixmap) 
 
 
@@ -263,7 +255,7 @@ class MainWindow(Window):
         elif (nfile.endswith(".cpp") or nfile.endswith(".h") or nfile.endswith(".c")):
             lang = 1
         elif nfile.endswith(".nut"):
-            lang = 0
+            lang = 2
         return lang
             
     def options(self):
@@ -282,5 +274,3 @@ if __name__ == "__main__":
     frame.showMaximized()
     splash.finish(frame)
     app.exec_()
-
-

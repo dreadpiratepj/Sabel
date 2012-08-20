@@ -61,7 +61,6 @@ class Editor(QsciScintilla):
         self.api.prepare()
         self.lexer.setAPIs(self.api) #Very important do not change line otherwise gg
         self.setLexer(self.lexer) #Very important do not change line otherwise gg
-        self.font.setPointSize(15)
         
         
     def setColorStyle(self,colorStyle):

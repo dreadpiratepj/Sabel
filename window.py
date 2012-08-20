@@ -1,9 +1,10 @@
 from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QHBoxLayout,QVBoxLayout,QTabWidget,QToolBar,QTextEdit,
                          QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar,
-                         QMainWindow)              
+                         QMainWindow,QPalette,QColor)              
 from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR
 from Widget import Tab,Tree
+from Widget.style import *
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,os_icon,config,workSpace,
@@ -24,7 +25,6 @@ class Window(QMainWindow):
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.styleIndex = styleIndex
-        
         #TabWidgets
         self.tab_1 = QWidget(self)
         self.tab_1.setObjectName("tab_1")
@@ -42,6 +42,7 @@ class Window(QMainWindow):
         self.tabWidget_3 = QTabWidget(self)
         self.tabWidget_3.setMaximumHeight(200)
         self.tabWidget_3.setObjectName("tabWidget_3")
+        
          
         #Tree
         self.tab_5 = QWidget()
@@ -185,6 +186,9 @@ class Window(QMainWindow):
         self.statusbar.addWidget(self.aboutButton)
         self.statusbar.setFixedHeight(18)
         
+        #Init colorstyling
+        self.colorStyle = None
+        self.initColorStyle()
         #Init
         self.setCentralWidget(self.centralwidget)
         self.setStatusBar(self.statusbar)
@@ -195,6 +199,14 @@ class Window(QMainWindow):
             self.tab_8.show()
         else:
             self.tab_8.hide()
+            
+    def initColorStyle(self):
+        self.colorStyle = self.checkColorStyle(self.styleIndex)
+        pal = QPalette(self.tabWidget_2.palette())
+        pal.setColor(QPalette.Base,self.colorStyle.paper)
+        pal.setColor(QPalette.Text,self.colorStyle.color)
+        self.tabWidget_2.setPalette(pal)
+        self.tabWidget_3.setPalette(pal)
     
     def initToolBar(self):
         self.action_NewProject = QAction(os_icon('newprj_wiz'), 'Project', self)
@@ -293,8 +305,6 @@ class Window(QMainWindow):
         men1.addActions(self.styleslist)
         self.action_Style.setMenu(men1)
         self.styleslist[self.styleIndex-1].setChecked(True)
-        #men1.triggered.connect(lambda:self.style_clicked(men1.childEvent()))
-
 
 
         self.action_Stop.setDisabled(True)
@@ -386,12 +396,37 @@ class Window(QMainWindow):
         edt = self.tabWidget.widget(self.tabWidget.currentIndex())
         while(edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())):
             edt.replaceText(self.lineEdit_2.text())
+            
+    def checkColorStyle(self,ind):
+        if ind == 0:
+            return Style0()
+        elif ind == 1:
+            return Style1()
+        elif ind == 2:
+            return Style2()
+        elif ind == 3:
+            return Style3()
+        elif ind == 4:
+            return Style4()
+        elif ind == 5:
+            return Style5()
+        elif ind == 6:
+            return Style6()
+        elif ind == 7:
+            return Style7()
+        elif ind == 8:
+            return Style8()
+        
     
     def style_clicked(self,no):
-        self.styleIndex = no
+        self.styleIndex = no -1
+        #print self.styleIndex
         for i in self.styleslist:
-            if self.styleslist.index(i) == self.styleIndex-1:
+            if self.styleslist.index(i) == self.styleIndex:
                 i.setChecked(True)
             else:
                 i.setChecked(False)
         config.setstyleIndex(self.styleIndex)
+        self.initColorStyle()
+        for i in range(len(self.files)):
+            self.tabWidget.widget(i).setColorStyle(self.colorStyle)

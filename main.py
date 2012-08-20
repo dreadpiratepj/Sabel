@@ -19,7 +19,7 @@ from window import Window
 from Widget import Editor,PyInterp,Adb
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,os_icon,config,workSpace,
-                     iconSize,iconDir,ospathexists,os_pixmap)
+                     iconSize,iconDir,ospathexists,os_pixmap) 
 
 
 class MainWindow(Window):
@@ -102,7 +102,7 @@ class MainWindow(Window):
                         config.removeFile(nfile)
                         QMessageBox.about(self,"Can't Open","File Does Not Exist or Locked\n"+nfile)
                     
-                    tab = Editor(self,text,self.syntax(nfile)) 
+                    tab = Editor(self,text,self.syntax(nfile),self.colorStyle) 
                     self.tabWidget.addTab(tab,ospathbasename(nfile))
                     tab.textChanged.connect(lambda:self.setDirty(nfile)) 
                     if(self.files != None):
@@ -265,9 +265,6 @@ class MainWindow(Window):
         elif nfile.endswith(".nut"):
             lang = 0
         return lang
-
-    def style(self):
-        pass
             
     def options(self):
         pass

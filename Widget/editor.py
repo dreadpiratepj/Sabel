@@ -1,21 +1,17 @@
-from globals import ospathjoin,os_pixmap,apiDir
+from globals import fontSize,fontName,ospathjoin,os_pixmap,apiDir
 
 from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor
+from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor ,QPalette
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
 from lexersquirrel import LexerSquirrel
-from style import Style
-
-
         
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
-    def __init__(self,parent,text,lang = 2,styleIndex = 0):
+    def __init__(self,parent,text,lang,colorStyle):
         QsciScintilla.__init__(self,parent)
         self.parent = parent
-        self.styleIndex = styleIndex
         self.lang = lang
-        self.colorStyle = None
+        self.colorStyle = colorStyle
         self.init()
         self.setText(text)
         #self.addAction(QAction("gg",self))
@@ -39,8 +35,13 @@ class Editor(QsciScintilla):
         #self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
         
     def init(self):
-        self.setColorStyle(self.styleIndex)
-        self.font = self.colorStyle.font
+        self.setCaretLineBackgroundColor(self.colorStyle.caret)
+        self.setMarginsBackgroundColor(self.colorStyle.margin)
+        self.setMarkerBackgroundColor(self.colorStyle.marker,self.ARROW_MARKER_NUM)
+        self.font = QFont()
+        self.font.setFamily(fontName)
+        self.font.setFixedPitch(True)
+        self.font.setPointSize(fontSize)
         self.setFont(self.font)
         self.fontmetrics = QFontMetrics(self.font)
         self.setMarginsFont(self.font)
@@ -60,13 +61,11 @@ class Editor(QsciScintilla):
         self.api.prepare()
         self.lexer.setAPIs(self.api) #Very important do not change line otherwise gg
         self.setLexer(self.lexer) #Very important do not change line otherwise gg
+        self.font.setPointSize(15)
         
         
-    def setColorStyle(self,styleIndex):
-        if styleIndex == 0:
-            self.colorStyle = Style()
-        elif styleIndex == 1:
-            self.colorStyle = Style()
+    def setColorStyle(self,colorStyle):
+        self.colorStyle = colorStyle
         self.setCaretLineBackgroundColor(self.colorStyle.caret)
         self.setMarginsBackgroundColor(self.colorStyle.margin)
         self.setMarkerBackgroundColor(self.colorStyle.marker,self.ARROW_MARKER_NUM)

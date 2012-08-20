@@ -5,9 +5,8 @@ ADB:
 - adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb
   shell kill
 File:
-- C:/CODE/assets/howtoscene.nut
-- C:/CODE/assets/logoscene.nut
 - C:/CODE/assets/creditscene.nut
+- C:/CODE/assets/main.nut
 Project:
 - C:/CODE/data/
 - C:/CODE/assets/
@@ -17,7 +16,7 @@ Setting:
   fontname: Courier New
   fontsize: 10
   iconsize: 16
-  styleindex: 7
+  styleindex: 0
   thresh: 1
   workspace: C:/CODE/
 Style: 0

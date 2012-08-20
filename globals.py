@@ -1,6 +1,6 @@
 import os
 from platform import system,python_version
-from PyQt4.QtGui import QIcon
+from PyQt4.QtGui import QIcon,QPixmap
 from send2trash import send2trash
 from config import Config
 
@@ -17,10 +17,15 @@ oswalk = os.walk
 osmkdir = os.mkdir
 osremove = os.remove
 osrename = os.rename
-workDir = os.getcwd()
-recycle = send2trash
 ossep = os.sep
 OS_NAME = system()
+
+workDir = os.getcwd()
+apiDir = "api"+ossep
+iconDir = ospathjoin(workDir,"Icons")
+
+
+recycle = send2trash
 PY_VERSION = python_version()
 
 config = Config()
@@ -29,8 +34,11 @@ fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
 colorStyle = config.colorStyle
-iconDir = ospathjoin(workDir,"Icons")
 adblist = config.adb()
 
 def os_icon(name):
-        return QIcon(":/{0}.gif".format("Icons"+ospathsep+name))
+        return QIcon(":/{0}.gif".format("Icons"+ossep+name))
+def os_pixmap(name):
+        return QPixmap(":/{0}.gif".format("Icons"+ossep+name))
+def getApi(name):
+        return QPixmap(":/{0}.gif".format("Icons"+ossep+name))

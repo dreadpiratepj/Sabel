@@ -71,3 +71,14 @@ class Style8:
         self.caret = QColor('#ffe4e4')
         self.marker = QColor('#ee1111')
         self.margin = QColor('#cccccc')
+        
+Styles = []
+Styles.append(Style0())
+Styles.append(Style1())
+Styles.append(Style2())
+Styles.append(Style3())
+Styles.append(Style4())
+Styles.append(Style5())
+Styles.append(Style6())
+Styles.append(Style7())
+Styles.append(Style8())

@@ -45,7 +45,7 @@ class Editor(QsciScintilla):
         self.setFont(self.font)
         self.fontmetrics = QFontMetrics(self.font)
         self.setMarginsFont(self.font)
-        self.setMarginWidth(0, self.fontmetrics.width("000") + 6)
+        self.setMarginWidth(0, self.fontmetrics.width("0000") + 6)
         # Margin 0 is used for line numbers
         self.setMarginLineNumbers(0, True)
         self.setCaretLineVisible(True)
@@ -68,6 +68,9 @@ class Editor(QsciScintilla):
         self.setCaretLineBackgroundColor(self.colorStyle.caret)
         self.setMarginsBackgroundColor(self.colorStyle.margin)
         self.setMarkerBackgroundColor(self.colorStyle.marker,self.ARROW_MARKER_NUM)
+        if self.lang == 2:
+            self.lexer.setColorStyle(self.colorStyle)
+            
             
     def on_margin_clicked(self, nmargin, nline, modifiers):
         # Toggle marker for the line the margin was clicked on

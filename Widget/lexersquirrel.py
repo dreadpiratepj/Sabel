@@ -1,4 +1,4 @@
-from PyQt4.Qsci import QsciLexerCustom,QsciStyle
+from PyQt4.Qsci import QsciLexerCustom,QsciStyle,QsciScintilla
 from PyQt4.QtCore import QString
 from PyQt4.QtGui import QFont, QColor
 from globals import fontName, fontSize
@@ -63,6 +63,8 @@ class LexerSquirrel(QsciLexerCustom):
         
     def setColorStyle(self,cs):
         self.colorStyle = cs
+        self.styles[0].setColor(self.colorStyle.color)
+        self.styles[0].setPaper(self.colorStyle.paper)
         
     def language(self):
         return 'Squirrel'
@@ -104,39 +106,81 @@ class LexerSquirrel(QsciLexerCustom):
         return QsciLexerCustom.defaultEolFill(self, ix)
     
     def styleText(self, start, end):
-        #print("LexerErlang.styleText(%d,%d)" % (start, end))
-        lines = self.getText(start, end)
-        offset = start
-        self.startStyling(offset, 0)
-        #print("startStyling()")
-        for i in lines:
-          length = len(i)
-          if i == "":
-            self.setStyling(1, self.styles[0])
-            #print("setStyling(1)")
-            offset += 1
-            continue
-          if i == '#':
-            self.setStyling(1, self.styles[2])
-            offset += 1
-            continue
-          if i == 'g':
-            self.setStyling(1, self.styles[3])
-            offset += 1
-            continue
-          if i[0] == '%':
-            self.setStyling(length+1, self.styles[1])
-            #print("setStyling(%)")
-            offset += length+1
-            continue
-          self.setStyling(length+1, self.styles[0])
-          #print("setStyling(n)")
-          offset += length+1
+        editor = self.editor()
+        if editor is None:
+            return
 
-    def getText(self, start, end):
-        data = self.sci.text()
-        #print("LexerErlang.getText(): " + str(len(data)) + " chars")
-        return data[start:end].split('\n')
+        SCI = editor.SendScintilla
+        set_style = self.setStyling
+
+        source = ''
+        if end > editor.length():
+            end = editor.length()
+        if end > start:
+            source = bytearray(end - start)
+            SCI(QsciScintilla.SCI_GETTEXTRANGE, start, end, source)
+        if not source:
+            return
+
+        self.startStyling(start, 0x1f)
+
+        index = SCI(QsciScintilla.SCI_LINEFROMPOSITION, start)
+
+        for line in source.splitlines(True):
+# Try to uncomment the following line to see in the console
+# how Scintiallla works. You have to think in terms of isolated
+# lines rather than globally on the whole text.
+          #  print line
+
+            length = len(line)
+
+            if line.startswith('#'):
+                newState = self.styles[3]
+            elif line.startswith('\t+') or line.startswith('    +'):
+                newState = self.styles[3]
+            else:
+                pos = SCI(QsciScintilla.SCI_GETLINEENDPOSITION, index) - length + 1
+                i = 0
+                while i < length:
+                    wordLength = 1
+
+                    self.startStyling(i + pos, 0x1f)
+                    newState = self.styles[0]
+                    """
+                    for word in self.words1:
+                        if line[i:].startswith(word):
+                                newState = self.styles[3]
+                                wordLength = len(word)
+                        
+                    """
+                    if chr(line[i]) in '0123456789':
+                        newState = self.styles[4]
+                    else:
+                        if line[i:].startswith("class"):
+                                newState = self.styles[2]
+                                wordLength = len('class')
+                        elif line[i:].startswith('function'):
+                                newState = self.styles[3]
+                                wordLength = len('function')
+                        elif line[i:].startswith('if'):
+                                newState = self.styles[4]
+                                wordLength = len('if')
+                        elif line[i:].startswith('#'):
+                                newState = self.styles[4]
+                                wordLength = length
+                        elif line[i:].startswith('//'):
+                                newState = self.styles[4]
+                                wordLength = length
+                        else:
+                            newState = self.styles[0]
+                         
+                    i += wordLength
+                    set_style(wordLength, newState)
+                newState = None
+            if newState:
+                set_style(length, newState)
+
+            index += 1
 
 
 import sys

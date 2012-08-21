@@ -4,7 +4,7 @@ from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QMainWindow,QPalette,QColor)              
 from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR,QStringList
 from Widget import Tab,Tree
-from Widget.style import *
+from Widget.style import Styles
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,__version__,os_icon,config,workSpace,
@@ -202,16 +202,6 @@ class Window(QMainWindow):
             self.tab_8.show()
         else:
             self.tab_8.hide()
-            
-    def initColorStyle(self):
-        self.colorStyle = self.checkColorStyle(self.styleIndex)
-        pal = QPalette(self.tabWidget_2.palette())
-        #print pal.color(QPalette.Base).name()
-        #print pal.color(QPalette.Window).name()
-        pal.setColor(QPalette.Base,self.colorStyle.paper)
-        pal.setColor(QPalette.Text,self.colorStyle.color)
-        self.tabWidget_2.setPalette(pal)
-        self.tabWidget_3.setPalette(pal)
 
     def initToolBar(self):
         self.action_NewProject = QAction(os_icon('newprj_wiz'), 'Project', self)
@@ -403,27 +393,16 @@ class Window(QMainWindow):
         while(edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())):
             edt.replaceText(self.lineEdit_2.text())
             
-    def checkColorStyle(self,ind):
-        if ind == 0:
-            return Style0()
-        elif ind == 1:
-            return Style1()
-        elif ind == 2:
-            return Style2()
-        elif ind == 3:
-            return Style3()
-        elif ind == 4:
-            return Style4()
-        elif ind == 5:
-            return Style5()
-        elif ind == 6:
-            return Style6()
-        elif ind == 7:
-            return Style7()
-        elif ind == 8:
-            return Style8()
-        
-    
+    def initColorStyle(self):
+        self.colorStyle = Styles[self.styleIndex]                
+        pal = QPalette(self.tabWidget_2.palette())
+        #print pal.color(QPalette.Base).name()
+        #print pal.color(QPalette.Window).name()
+        pal.setColor(QPalette.Base,self.colorStyle.paper)
+        pal.setColor(QPalette.Text,self.colorStyle.color)
+        self.tabWidget_2.setPalette(pal)
+        self.tabWidget_3.setPalette(pal)
+            
     def style_clicked(self,no):
         self.styleIndex = no -1
         #print self.styleIndex

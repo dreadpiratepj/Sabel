@@ -1,13 +1,13 @@
-from PyQt4.Qsci import QsciLexerCustom,QsciStyle,QsciScintilla
+from PyQt4.Qsci import QsciLexerCustom,QsciStyle,QsciScintilla,QsciLexerPython
 from PyQt4.QtCore import QString
 from PyQt4.QtGui import QFont, QColor
 from globals import fontName, fontSize
 
-class LexerSquirrel(QsciLexerCustom):
+class LexerSquirrel(QsciLexerPython):
     words1 = [
          'base','break','case','catch','class','clone',
          'continue','const','default','delete','else','enum',
-         'extends','for','foreach','function','if','in',
+         'extends','for','foreach','function',' if',' in',
          'local','null','resume','return','switch','this',
          'throw','try','typeof','while','yield','constructor',
          'instanceof','true','false','static'
@@ -31,12 +31,10 @@ class LexerSquirrel(QsciLexerCustom):
         'getattributes', 'getclass', 'getstatus', 'ref'
         ]
         
-    words4 = [
-         ]
     def __init__(self,colorStyle, parent = None):
-        QsciLexerCustom.__init__(self, parent)
-        self.parent = parent
-        self.sci = self.parent
+        QsciLexerPython.__init__(self, parent)
+        #self.parent = parent
+        #self.sci = self.parent
         self.colorStyle = colorStyle
         self.plainFont = QFont()
         self.plainFont.setFamily(fontName)
@@ -45,21 +43,22 @@ class LexerSquirrel(QsciLexerCustom):
         self.marginFont = QFont()
         self.marginFont.setPointSize(10)
         self.marginFont.setFamily("MS Dlg")
-        self.boldFont = QFont()
-        self.boldFont.setPointSize(10)
-        self.boldFont.setFamily("Courier New")
+        self.boldFont = QFont(self.plainFont)
         self.boldFont.setBold(True)
         self.styles = [
           #index description color paper font eol
           QsciStyle(0, QString("base"), self.colorStyle.color, self.colorStyle.paper, self.plainFont, True),
-          QsciStyle(1, QString("comment"), QColor("#008000"), QColor("#eeffee"), self.marginFont, True),
-          QsciStyle(2, QString("keyword"), QColor("#000080"), QColor("#ffffff"), self.boldFont, False),
-          QsciStyle(3, QString("string"), QColor("#800000"), QColor("#ffffff"), self.marginFont, True),
-          QsciStyle(4, QString("atom"), QColor("#008080"), QColor("#ffffff"), self.plainFont, True),
-          QsciStyle(5, QString("macro"), QColor("#808000"), QColor("#ffffff"), self.boldFont, True),
+          QsciStyle(1, QString("comment"), QColor("#008000"), QColor("#eeffee"), self.plainFont, True),
+          QsciStyle(2, QString("keyword"), QColor("#008000"), QColor("#ffffff"), self.boldFont, False),
+          QsciStyle(3, QString("string"), QColor("#008000"), QColor("#ffffff"), self.plainFont, True),
+          QsciStyle(4, QString("number"), QColor("#008000"), QColor("#ffffff"), self.plainFont, True),
+          QsciStyle(5, QString("macro"), QColor("#808000"), QColor("#ffffff"), self.plainFont, True),
           QsciStyle(6, QString("error"), QColor("#000000"), QColor("#ffd0d0"), self.plainFont, True),
+          QsciStyle(7, QString("MultiComment_start"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
+          QsciStyle(8, QString("MultiComment"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
+          QsciStyle(9, QString("MultiComment_stop"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False)
         ]
-        #print("LexerErlang created")
+        self._foldcompact = True
         
     def setColorStyle(self,cs):
         self.colorStyle = cs
@@ -111,6 +110,12 @@ class LexerSquirrel(QsciLexerCustom):
             return
 
         SCI = editor.SendScintilla
+        GETFOLDLEVEL = QsciScintilla.SCI_GETFOLDLEVEL
+        SETFOLDLEVEL = QsciScintilla.SCI_SETFOLDLEVEL
+        HEADERFLAG = QsciScintilla.SC_FOLDLEVELHEADERFLAG
+        LEVELBASE = QsciScintilla.SC_FOLDLEVELBASE
+        NUMBERMASK = QsciScintilla.SC_FOLDLEVELNUMBERMASK
+        WHITEFLAG = QsciScintilla.SC_FOLDLEVELWHITEFLAG
         set_style = self.setStyling
 
         source = ''
@@ -121,38 +126,62 @@ class LexerSquirrel(QsciLexerCustom):
             SCI(QsciScintilla.SCI_GETTEXTRANGE, start, end, source)
         if not source:
             return
-
-        self.startStyling(start, 0x1f)
-
+           
+        compact = self.foldCompact()
         index = SCI(QsciScintilla.SCI_LINEFROMPOSITION, start)
-
+        if index > 0:
+            pos = SCI(QsciScintilla.SCI_GETLINEENDPOSITION, index - 1)
+            prevState = SCI(QsciScintilla.SCI_GETSTYLEAT, pos)
+        else:
+            prevState = self.styles[0]
+            
+        self.startStyling(start, 0x1f)
         for line in source.splitlines(True):
-# Try to uncomment the following line to see in the console
-# how Scintiallla works. You have to think in terms of isolated
-# lines rather than globally on the whole text.
           #  print line
-
             length = len(line)
-
-            if line.startswith('#'):
-                newState = self.styles[3]
-            elif line.startswith('\t+') or line.startswith('    +'):
-                newState = self.styles[3]
+            # We must take care of empty lines.This is done here.
+            if length == 1:
+                if prevState == self.styles[8] or prevState == self.styles[7]:
+                    newState = self.styles[8]
+                else:
+                    newState = self.styles[0]
+            #if line.startswith('#'):
+            #    newState = self.styles[3]
+            #elif line.startswith('\t+') or line.startswith('    +'):
+            #    newState = self.styles[3]
+            #We work with a non empty line.
             else:
+                if line.startswith('@'):
+                    newState = self.styles[7]
+                elif line.startswith('@'):
+                    if prevState == self.styles[8] or prevState == self.styles[7]:
+                        newState = self.styles[9]
+                    else:
+                        newState = self.styles[0]
+                #elif line.startswith('//'):
+                #    if prevState == self.styles[8] or prevState == self.styles[7]:
+                #        newState = self.styles[8]
+                #    else:
+                #        newState = self.styles[8]
+                elif prevState == self.styles[8] or prevState == self.styles[7]:
+                    newState = self.styles[8]
+                else:
+                    newState = self.styles[0]
+            #set_style(length, newState)
                 pos = SCI(QsciScintilla.SCI_GETLINEENDPOSITION, index) - length + 1
                 i = 0
                 while i < length:
                     wordLength = 1
-
+                    
                     self.startStyling(i + pos, 0x1f)
                     newState = self.styles[0]
-                    """
-                    for word in self.words1:
+                    
+                    for word in self.words2:
                         if line[i:].startswith(word):
-                                newState = self.styles[3]
+                                newState = self.styles[4]
                                 wordLength = len(word)
                         
-                    """
+                    
                     if chr(line[i]) in '0123456789':
                         newState = self.styles[4]
                     else:
@@ -162,27 +191,60 @@ class LexerSquirrel(QsciLexerCustom):
                         elif line[i:].startswith('function'):
                                 newState = self.styles[3]
                                 wordLength = len('function')
-                        elif line[i:].startswith('if'):
+                        elif line[i:].startswith(' if'):
                                 newState = self.styles[4]
-                                wordLength = len('if')
+                                wordLength = len(' if')
                         elif line[i:].startswith('#'):
                                 newState = self.styles[4]
                                 wordLength = length
                         elif line[i:].startswith('//'):
                                 newState = self.styles[4]
                                 wordLength = length
-                        else:
-                            newState = self.styles[0]
+                        elif line[i:].startswith('/*'):
+                                newState = self.styles[4]
+                                wordLength = length
+                        elif line[i:].startswith('*/'):
+                                newState = self.styles[4]
+                                wordLength = length
+                        #else:
+                            #newState = self.styles[0]
+                    
                          
                     i += wordLength
                     set_style(wordLength, newState)
                 newState = None
+            
             if newState:
                 set_style(length, newState)
+                
+            #Folding
+            # folding implementation goes here
+            #levelFolder = editor.SendScintilla(editor.SCI_GETFOLDLEVEL, index-1)
+            #if line.startswith('+'):
+            #     SCI(SETFOLDLEVEL, index, levelFolder + 1)
+            #     #editor.SendScintilla(editor.SCI_SETFOLDLEVEL, index, levelFolder + 1)
+            #elif line.startswith('function'):
+            #     SCI(SETFOLDLEVEL, index, levelFolder + 1)
+                 #editor.SendScintilla(editor.SCI_SETFOLDLEVEL, index, levelFolder + 1)
+            """
+            if newState == self.styles[7]:
+                if prevState == self.styles[8]:
+                    level = LEVELBASE + 1
+                else:
+                    level = LEVELBASE | HEADERFLAG
+            elif newState == self.styles[8] or newState == self.styles[9]:
+                level = LEVELBASE + 1
+            else:
+                level = LEVELBASE
 
+            SCI(SETFOLDLEVEL, index, level)
+
+            pos = SCI(QsciScintilla.SCI_GETLINEENDPOSITION, index)
+            prevState = SCI(QsciScintilla.SCI_GETSTYLEAT, pos)"""
             index += 1
 
 
+"""
 import sys
 from PyQt4 import QtCore, QtGui, Qsci
 
@@ -294,3 +356,4 @@ if __name__ == "__main__":
      win = MainWindow()
      win.show()
      sys.exit(app.exec_())
+"""

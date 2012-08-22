@@ -17,7 +17,7 @@ exe = Executable(
     copyDependentFiles = True,
     appendScriptToExe = False,
     appendScriptToLibrary = False,
-    icon = None
+    icon = "C:\CODE\Icons\sabel.ico"
     )
 
 setup(

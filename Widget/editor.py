@@ -1,6 +1,6 @@
 from globals import fontSize,fontName,ospathjoin,os_pixmap,apiDir
 
-from PyQt4.QtCore import SIGNAL
+from PyQt4.QtCore import SIGNAL,QString
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor ,QPalette
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
 from lexersquirrel import LexerSquirrel
@@ -12,7 +12,7 @@ class Editor(QsciScintilla):
         self.parent = parent
         self.lang = lang
         self.colorStyle = colorStyle
-        self.init()
+        #self.init()
         self.setText(text)
         #self.addAction(QAction("gg",self))
         #self.findFirst("function",False,True,True,True)
@@ -31,8 +31,10 @@ class Editor(QsciScintilla):
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
         self.setAutoCompletionThreshold(1)
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
+        self.setFolding(QsciScintilla.BoxedTreeFoldStyle)
         #self.setAutoCompletionSource(QsciScintilla.AcsAll)
         #self.SendScintilla(QsciScintilla.SCI_STYLESETFONT, 1, 'Courier')
+        self.init()
         
     def init(self):
         self.setCaretLineBackgroundColor(self.colorStyle.caret)
@@ -45,9 +47,11 @@ class Editor(QsciScintilla):
         self.setFont(self.font)
         self.fontmetrics = QFontMetrics(self.font)
         self.setMarginsFont(self.font)
-        self.setMarginWidth(0, self.fontmetrics.width("0000") + 6)
         # Margin 0 is used for line numbers
-        self.setMarginLineNumbers(0, True)
+        #self.setMarginLineNumbers(0, True)
+        #self.setMarginWidth(0, self.fontmetrics.width("0000") + 6)
+        self.setMarginLineNumbers(1, True)
+        self.setMarginWidth(1, QString("-------"))
         self.setCaretLineVisible(True)
         if self.lang == 0:
             self.lexer = QsciLexerPython()

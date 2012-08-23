@@ -6,6 +6,9 @@ ADB:
   shell kill
 File:
 - C:/CODE/assets/creditscene.nut
+- C:/CODE/assets/common.nut
+- C:/CODE/assets/logoscene.nut
+- C:/CODE/assets/main.nut
 Project:
 - C:/CODE/data/
 - C:/CODE/assets/

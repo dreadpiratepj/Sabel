@@ -45,18 +45,41 @@ class LexerSquirrel(QsciLexerPython):
         self.marginFont.setFamily("MS Dlg")
         self.boldFont = QFont(self.plainFont)
         self.boldFont.setBold(True)
+        """    
+        enum {
+          Default = 0, Comment = 1, Number = 2,
+          DoubleQuotedString = 3, SingleQuotedString = 4, Keyword = 5,
+          TripleSingleQuotedString = 6, TripleDoubleQuotedString = 7, ClassName = 8,
+          FunctionMethodName = 9, Operator = 10, Identifier = 11,
+          CommentBlock = 12, UnclosedString = 13, HighlightedIdentifier = 14,
+          Decorator = 15
+        }
+        enum IndentationWarning {
+          NoWarning = 0, Inconsistent = 1, TabsAfterSpaces = 2,
+          Spaces = 3, Tabs = 4
+        } 
+        """
         self.styles = [
           #index description color paper font eol
           QsciStyle(0, QString("base"), self.colorStyle.color, self.colorStyle.paper, self.plainFont, True),
-          QsciStyle(1, QString("comment"), QColor("#008000"), QColor("#eeffee"), self.plainFont, True),
-          QsciStyle(2, QString("keyword"), QColor("#008000"), QColor("#ffffff"), self.boldFont, False),
-          QsciStyle(3, QString("string"), QColor("#008000"), QColor("#ffffff"), self.plainFont, True),
-          QsciStyle(4, QString("number"), QColor("#008000"), QColor("#ffffff"), self.plainFont, True),
-          QsciStyle(5, QString("macro"), QColor("#808000"), QColor("#ffffff"), self.plainFont, True),
-          QsciStyle(6, QString("error"), QColor("#000000"), QColor("#ffd0d0"), self.plainFont, True),
-          QsciStyle(7, QString("MultiComment_start"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
-          QsciStyle(8, QString("MultiComment"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
-          QsciStyle(9, QString("MultiComment_stop"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False)
+          QsciStyle(1, QString("comment"), QColor("#008000"), self.colorStyle.paper, self.plainFont, True),
+          QsciStyle(2, QString("number"), QColor("#008000"), self.colorStyle.paper, self.boldFont, False),
+          QsciStyle(3, QString("DoubleQuotedString"), QColor("#008000"), self.colorStyle.paper, self.plainFont, True),
+          QsciStyle(4, QString("SingleQuotedString"), QColor("#008000"), self.colorStyle.paper, self.plainFont, True),
+          QsciStyle(5, QString("Keyword"), QColor("#808000"), self.colorStyle.paper, self.plainFont, True),
+          QsciStyle(6, QString("TripleSingleQuotedString"), self.colorStyle.paper, QColor("#ffd0d0"), self.plainFont, True),
+          QsciStyle(7, QString("TripleDoubleQuotedString"), self.colorStyle.paper, QColor("#001111"), self.plainFont, False),
+          QsciStyle(8, QString("ClassName"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(9, QString("FunctionMethodName"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(10, QString("Operator"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(11, QString("Identifier"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(12, QString("CommentBlock"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(13, QString("UnclosedString"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(14, QString("HighlightedIdentifier"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(15, QString("Decorator"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False)
+          #QsciStyle(7, QString("MultiComment_start"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
+          #QsciStyle(8, QString("MultiComment"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
+          #QsciStyle(9, QString("MultiComment_stop"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False)
         ]
         self._foldcompact = True
         

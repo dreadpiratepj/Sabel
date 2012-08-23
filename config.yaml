@@ -6,6 +6,8 @@ ADB:
   shell kill
 File:
 - C:/CODE/assets/runtime.nut
+- C:/CODE/assets/main.nut
+- C:/CODE/assets/howtoscene.nut
 Project:
 - C:/CODE/data/
 - C:/CODE/assets/
@@ -15,7 +17,7 @@ Setting:
   fontname: Courier New
   fontsize: 10
   iconsize: 16
-  styleindex: 0
+  styleindex: 4
   thresh: 1
   workspace: C:/CODE/
 Style: 0

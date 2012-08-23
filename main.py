@@ -8,7 +8,7 @@ from PyQt4.QtGui import (QApplication,QPixmap,QSplashScreen,QMessageBox,
 from PyQt4.QtCore import SIGNAL,Qt,QStringList,QString
 import icons_rc
 from window import Window
-from Widget import Editor,PyInterp,Adb
+from Widget import Editor,PyInterp,Adb,Parser
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,os_icon,config,workSpace,
                      iconSize,iconDir,ospathexists,os_pixmap) 
@@ -24,6 +24,7 @@ class MainWindow(Window):
         self.dirty = None
         self.isFull = False
         self.adb = Adb(self)
+        self.parser = Parser(self)
         self.init()
 
     def init(self):
@@ -207,6 +208,7 @@ class MainWindow(Window):
                     fl.write(tempText)
                     fl.close()
                     self.clearDirty(index)
+                    self.parser.run(self.files[index])
                 else:
                     QMessageBox.about(self, "Can't Save","Failed to save ...")
                     self.statusBar().showMessage('Failed to save ...', 5000)
@@ -234,6 +236,7 @@ class MainWindow(Window):
     def closeEvent(self, event):
         #check this ine adb.exe process is always on
         self.adb.close()
+        self.parser.close()
         notSaved = False
         for files in self.dirty:
             if files == True:

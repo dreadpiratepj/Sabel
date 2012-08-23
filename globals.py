@@ -5,7 +5,7 @@ __version__ = "0.48"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
-__version__ = "0.48"
+__version__ = "0.49"
 
 
 import os
@@ -36,6 +36,8 @@ OS_NAME = system()
 workDir = os.getcwd()
 apiDir = ospathjoin(workDir,"api")
 iconDir = ospathjoin("Icons")
+binDir = ospathjoin(workDir,"bin")
+sqcDir = ospathjoin(binDir,"sqc.exe")
 
 
 recycle = send2trash

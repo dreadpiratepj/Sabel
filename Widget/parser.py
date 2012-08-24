@@ -1,8 +1,8 @@
 from globals import sqcDir
 from PyQt4.QtGui import QWidget
 import threading
-from subprocess import PIPE,Popen,STDOUT
-from PyQt4.QtCore import pyqtSignal,SIGNAL
+from subprocess import PIPE,Popen
+from PyQt4.QtCore import SIGNAL
 
 
 class Parser(QWidget):

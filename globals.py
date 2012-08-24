@@ -5,7 +5,7 @@ __version__ = "0.48"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
-__version__ = "0.49"
+__version__ = "0.50"
 
 
 import os
@@ -49,9 +49,14 @@ fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
 styleIndex = config.styleIndex()
+thresHold = config.thresh()
 adblist = config.adb()
 
 def os_icon(name):
         return QIcon(":/{0}.gif".format(ospathjoin(iconDir,name)))
 def os_pixmap(name):
         return QPixmap(":/{0}.gif".format(ospathjoin(iconDir,name)))
+def os_icon_png(name):
+        return QIcon(":/{0}.png".format(ospathjoin(iconDir,name)))
+def os_pixmap_png(name):
+        return QPixmap(":/{0}.png".format(ospathjoin(iconDir,name)))

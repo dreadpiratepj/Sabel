@@ -6,12 +6,12 @@
 from PyQt4.QtGui import (QApplication,QPixmap,QSplashScreen,QMessageBox,
                          QIcon,QAction,QCheckBox,QFileDialog)
 from PyQt4.QtCore import SIGNAL,Qt,QStringList,QString
-import icons_rc
+import icons
 from window import Window
 from Widget import Editor,PyInterp,Adb,Parser
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,os_icon,config,workSpace,
-                     iconSize,iconDir,ospathexists,os_pixmap) 
+                     iconSize,iconDir,ospathexists,os_pixmap,os_pixmap_png) 
 
 
 class MainWindow(Window):
@@ -267,7 +267,7 @@ class MainWindow(Window):
 
 if __name__ == "__main__":
     app = QApplication([])
-    splash_pix = os_pixmap('logo')
+    splash_pix = os_pixmap_png('logosabel')
     splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
     splash.setMask(splash_pix.mask())
     splash.show()

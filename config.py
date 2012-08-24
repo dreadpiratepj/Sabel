@@ -44,6 +44,13 @@ class Config:
     def adb(self):
         return self.read('ADB')
     
+    def thresh(self):
+        return self.readSetting('thresh')
+    
+    def setThresh(self,val):
+        self.writeSetting('thresh',val)
+        self.write()
+    
     def styleIndex(self):
         return self.readSetting('styleindex')
     

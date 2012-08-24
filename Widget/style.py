@@ -66,8 +66,8 @@ class Style7:
         
 class Style8:
     def __init__(self):
-        self.color = QColor('#eeFeFe')
-        self.paper = QColor('#0f0f00')
+        self.color = QColor('#000000')
+        self.paper = QColor('#ffffff')
         self.caret = QColor('#ffe4e4')
         self.marker = QColor('#ee1111')
         self.margin = QColor('#cccccc')

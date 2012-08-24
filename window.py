@@ -7,7 +7,7 @@ from Widget import Tab,Tree
 from Widget.style import Styles
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
-                     OS_NAME,PY_VERSION,__version__,os_icon,config,workSpace,
+                     OS_NAME,PY_VERSION,__version__,os_icon,os_icon_png,config,workSpace,
                      iconSize,iconDir,styleIndex)
 
 
@@ -19,7 +19,7 @@ class Window(QMainWindow):
         self.setObjectName("self")
         self.resize(758, 673)
         self.setWindowTitle("Sabel")
-        self.setWindowIcon(os_icon("sample"))
+        self.setWindowIcon(os_icon_png("sabel-icon1"))
         self.centralwidget = QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -103,6 +103,10 @@ class Window(QMainWindow):
         self.lineEdit.setObjectName("lineEdit")
         self.lineEdit_2 = QLineEdit(self.tab_8)
         self.lineEdit_2.setObjectName("lineEdit_2")
+        self.findClose = QPushButton(self.tab_8)
+        self.findClose.setIcon(os_icon("close_view"))
+        self.findClose.setFlat(True)
+        self.findClose.clicked.connect(self.findBarShow)
         self.find = QPushButton(self.tab_8)
         self.find.setText("Find")
         self.find.clicked.connect(self.findCurrentText)
@@ -127,6 +131,7 @@ class Window(QMainWindow):
         self.backward.setText("bk")
         self.backward.setCheckable(True)
         self.backward.setDisabled(True)
+        self.horizontalLayout_5.addWidget(self.findClose)
         self.horizontalLayout_5.addWidget(self.find)
         self.horizontalLayout_5.addWidget(self.lineEdit)
         self.horizontalLayout_5.addWidget(self.lineEdit_2)
@@ -181,11 +186,21 @@ class Window(QMainWindow):
         self.findButton.clicked.connect(self.findBarShow)
         self.aboutButton = QPushButton(self)
         self.aboutButton.setFlat(True)
-        self.aboutButton.setIcon(os_icon('alert_obj'))
+        self.aboutButton.setIcon(os_icon('toc_anchor_obj'))
         self.aboutButton.clicked.connect(self.about)
+        self.zoominButton = QPushButton(self)
+        self.zoominButton.setFlat(True)
+        self.zoominButton.setIcon(os_icon('zoomplus'))
+        self.zoominButton.clicked.connect(self.zoomin)
+        self.zoomoutButton = QPushButton(self)
+        self.zoomoutButton.setFlat(True)
+        self.zoomoutButton.setIcon(os_icon('zoomminus'))
+        self.zoomoutButton.clicked.connect(self.zoomout)
         self.statusbar.addWidget(self.cmdButton)
         self.statusbar.addWidget(self.findButton)
         self.statusbar.addWidget(self.aboutButton)
+        self.statusbar.addWidget(self.zoominButton)
+        self.statusbar.addWidget(self.zoomoutButton)
         self.statusbar.setFixedHeight(18)
         
         #Init colorstyling
@@ -194,7 +209,6 @@ class Window(QMainWindow):
         #Init
         self.setCentralWidget(self.centralwidget)
         self.setStatusBar(self.statusbar)
-        self
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
         
     def findBarShow(self):
@@ -232,8 +246,8 @@ class Window(QMainWindow):
         self.action_Run = QAction(os_icon('lrun_obj'), 'Run', self)
         self.action_Run.setShortcut('Ctrl+R')
         self.action_Run.triggered.connect(self.adb.run)
-        self.action_RunFile = QAction(os_icon('start_ccs_task'), 'File', self)
-        self.action_Stop = QAction(os_icon('term_sbook'), 'Stop', self)
+        self.action_RunFile = QAction(os_icon('nav_go'), 'File', self)
+        self.action_Stop = QAction(os_icon('nav_stop'), 'Stop', self)
         self.action_Stop.setShortcut('Ctrl+Q')
         self.action_Stop.triggered.connect(self.adb.stop)
         self.action_Design = QAction(os_icon('task_set'), 'Design', self)
@@ -247,10 +261,12 @@ class Window(QMainWindow):
         men.addAction(QAction("Edit",self))
         men.addAction(QAction("Paste",self))
         men.addAction(QAction("Tabs",self))
-        self.action_Options = QAction(QIcon(":/{0}.png".format("Icons"+ospathsep+'emblem-system')), 'Options', self)
+        self.action_Options = QAction(os_icon_png('emblem-system'), 'Options', self)
         self.action_Options.setMenu(men)
         self.action_Options.triggered.connect(self.options)
-        self.action_Full = QAction(os_icon('task_set'), 'Full', self)
+        
+        
+        self.action_Full = QAction(os_icon('fullscreen'), 'Full', self)
         self.action_Full.setShortcut('Shift+Enter')
         self.action_Full.triggered.connect(self.full)
 
@@ -299,7 +315,7 @@ class Window(QMainWindow):
         self.styleslist.append(self.style9)
         men1.addActions(self.styleslist)
         self.action_Style.setMenu(men1)
-        self.styleslist[self.styleIndex-1].setChecked(True)
+        self.styleslist[self.styleIndex].setChecked(True)
 
 
         self.action_Stop.setDisabled(True)
@@ -334,12 +350,12 @@ class Window(QMainWindow):
                 All rights reserved in accordance with
                 GPL v3 or later.
                 <p>This application can be used for Squirrel and EmoFramework Projects.
-                <p>Squirrel Shell (c) 2006-2011, Constantin Makshin
-                <p>Squirrel (c) Alberto Demichelis
-                <p>zlib (c) Jean-loup Gailly and Mark Adler
-                <p>Icons (c) Eclipse EPL
+                <p>Squirrel Shell Copyright (c) 2006-2011, Constantin Makshin
+                <p>Squirrel Copyright (c) Alberto Demichelis
+                <p>zlib Copyright (c) Jean-loup Gailly and Mark Adler
+                <p>Icons Copyright (c) Eclipse EPL
+                <p>Emo-Framework Copyright (c) 2011 Kota Iguchi
                 <p>Python %s - Qt %s - PyQt %s on %s
-                <p>Copyright (c) 2011 emo-framework project
                 <p>Created By: pyros2097
                 <p>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
                  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,INCLUDING, BUT NOT
@@ -392,6 +408,13 @@ class Window(QMainWindow):
         edt = self.tabWidget.widget(self.tabWidget.currentIndex())
         while(edt.findText(self.lineEdit.text(),self.regex.isChecked(),self.caseSensitive.isChecked(),self.wholeWord.isChecked(),self.backward.isChecked())):
             edt.replaceText(self.lineEdit_2.text())
+            
+    def zoomin(self):
+        for i in range(len(self.files)):
+            self.tabWidget.widget(i).zoomin()
+    def zoomout(self):
+        for i in range(len(self.files)):
+            self.tabWidget.widget(i).zoomout()
             
     def initColorStyle(self):
         self.colorStyle = Styles[self.styleIndex]                

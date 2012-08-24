@@ -4,10 +4,12 @@ ADB:
 - adb -d logcat -s EmoFramework
 - adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb
   shell kill
+ANT:
+- android update project --target 5 --path .
+- ant debug install
 File:
-- C:/CODE/assets/runtime.nut
+- C:/CODE/assets/common.nut
 - C:/CODE/assets/main.nut
-- C:/CODE/assets/howtoscene.nut
 Project:
 - C:/CODE/data/
 - C:/CODE/assets/
@@ -17,7 +19,7 @@ Setting:
   fontname: Courier New
   fontsize: 10
   iconsize: 16
-  styleindex: 4
+  styleindex: 8
   thresh: 1
   workspace: C:/CODE/
 Style: 0

@@ -66,16 +66,16 @@ class LexerSquirrel(QsciLexerPython):
           QsciStyle(2, QString("number"), QColor("#008000"), self.colorStyle.paper, self.boldFont, False),
           QsciStyle(3, QString("DoubleQuotedString"), QColor("#008000"), self.colorStyle.paper, self.plainFont, True),
           QsciStyle(4, QString("SingleQuotedString"), QColor("#008000"), self.colorStyle.paper, self.plainFont, True),
-          QsciStyle(5, QString("Keyword"), QColor("#808000"), self.colorStyle.paper, self.plainFont, True),
-          QsciStyle(6, QString("TripleSingleQuotedString"), self.colorStyle.paper, QColor("#ffd0d0"), self.plainFont, True),
-          QsciStyle(7, QString("TripleDoubleQuotedString"), self.colorStyle.paper, QColor("#001111"), self.plainFont, False),
-          QsciStyle(8, QString("ClassName"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
-          QsciStyle(9, QString("FunctionMethodName"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(5, QString("Keyword"), QColor("#000000"), self.colorStyle.paper, self.boldFont, True),
+          QsciStyle(6, QString("TripleSingleQuotedString"), QColor("#ffd0d0"),self.colorStyle.paper, self.plainFont, True),
+          QsciStyle(7, QString("TripleDoubleQuotedString"),QColor("#001111"),self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(8, QString("ClassName"), QColor("#000000"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(9, QString("FunctionMethodName"), QColor("#000000"), self.colorStyle.paper, self.plainFont, False),
           QsciStyle(10, QString("Operator"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
-          QsciStyle(11, QString("Identifier"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
-          QsciStyle(12, QString("CommentBlock"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
-          QsciStyle(13, QString("UnclosedString"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
-          QsciStyle(14, QString("HighlightedIdentifier"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(11, QString("Identifier"), QColor("#000000"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(12, QString("CommentBlock"), QColor("#000000"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(13, QString("UnclosedString"), QColor("#010101"), self.colorStyle.paper, self.plainFont, False),
+          QsciStyle(14, QString("HighlightedIdentifier"), QColor("#0000ff"), self.colorStyle.paper, self.plainFont, False),
           QsciStyle(15, QString("Decorator"), QColor("#ff00ff"), self.colorStyle.paper, self.plainFont, False)
           #QsciStyle(7, QString("MultiComment_start"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
           #QsciStyle(8, QString("MultiComment"), QColor("#ff00ff"), QColor("#001111"), self.plainFont, False),
@@ -85,8 +85,10 @@ class LexerSquirrel(QsciLexerPython):
         
     def setColorStyle(self,cs):
         self.colorStyle = cs
+        for i in self.styles:
+            i.setPaper(self.colorStyle.paper)
         self.styles[0].setColor(self.colorStyle.color)
-        self.styles[0].setPaper(self.colorStyle.paper)
+        
         
     def language(self):
         return 'Squirrel'

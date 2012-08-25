@@ -3,12 +3,12 @@ from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar,
                          QMainWindow,QPalette,QColor)              
 from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR,QStringList
-from Widget import Tab,Tree
+from Widget import Tab,Tree,DialogAndroid
 from Widget.style import Styles
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,__version__,os_icon,os_icon_png,config,workSpace,
-                     iconSize,iconDir,styleIndex)
+                     iconSize,iconDir,styleIndex,adblist)
 
 
 
@@ -56,9 +56,15 @@ class Window(QMainWindow):
         self.treeWidget.setObjectName("treeWidget")
         self.treebar = QToolBar()
         action_Folder = QAction(os_icon('newfolder_wiz'),'New Folder', self)
+        action_Folder.triggered.connect(self.about)
+        action_Android = QAction(os_icon_png('android1'),'Android', self)
+        action_Android.triggered.connect(self.android)
+        action_Ant = QAction(os_icon('ant_view'),'Ant', self)
+        action_Ant.triggered.connect(self.ant)
         self.treebar.addAction(action_Folder)
+        self.treebar.addAction(action_Android)
+        self.treebar.addAction(action_Ant)
         self.treebar.setIconSize(QSize(16,16))
-        self.treebar.setMaximumHeight(23)
         self.VerticalLayout_2.addWidget(self.treebar)
         self.VerticalLayout_2.addWidget(self.treeWidget)
         
@@ -201,7 +207,7 @@ class Window(QMainWindow):
         self.statusbar.addWidget(self.aboutButton)
         self.statusbar.addWidget(self.zoominButton)
         self.statusbar.addWidget(self.zoomoutButton)
-        self.statusbar.setFixedHeight(18)
+        #self.statusbar.setFixedHeight(18)
         
         #Init colorstyling
         self.colorStyle = None
@@ -384,6 +390,18 @@ class Window(QMainWindow):
         else:
             self.setWindowState(Qt.WindowMaximized)
             self.isFull = False
+            
+    def android(self):
+        form = DialogAndroid(self)
+        form.lineEdit_2.setText(adblist[0])
+        form.lineEdit_3.setText(adblist[1])
+        form.lineEdit_4.setText(adblist[2])
+        form.lineEdit_5.setText(adblist[3])
+        #form.exec_()
+        form.show()
+    
+    def ant(self):
+        pass
             
     def cmd(self):
         if(self.tabWidget_3.isHidden()):

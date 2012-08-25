@@ -5,3 +5,4 @@ from adb import Adb
 from parser import Parser
 from ipython import PyInterp
 from style import *
+from dialogs import *

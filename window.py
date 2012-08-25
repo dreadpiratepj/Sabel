@@ -393,10 +393,6 @@ class Window(QMainWindow):
             
     def android(self):
         form = DialogAndroid(self)
-        form.lineEdit_2.setText(adblist[0])
-        form.lineEdit_3.setText(adblist[1])
-        form.lineEdit_4.setText(adblist[2])
-        form.lineEdit_5.setText(adblist[3])
         #form.exec_()
         form.show()
     

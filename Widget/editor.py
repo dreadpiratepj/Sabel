@@ -1,4 +1,4 @@
-from globals import fontSize,fontName,ospathjoin,os_pixmap,apiDir,thresHold
+from globals import fontSize,fontName,ospathjoin,os_pixmap,apiDir,thresHold,config
 from PyQt4.QtCore import SIGNAL,QString
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor ,QPalette
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
@@ -80,6 +80,7 @@ class Editor(QsciScintilla):
     
     def zoomin(self):
         self.fontSize += 1
+        config.setFontSize(self.fontSize)
         self.font.setPointSize(self.fontSize)
         #self.setFont(self.font)
         self.lexer.setFont(self.font)
@@ -87,6 +88,7 @@ class Editor(QsciScintilla):
         
     def zoomout(self):
         self.fontSize -= 1
+        config.setFontSize(self.fontSize)
         self.font.setPointSize(self.fontSize)
         #self.setFont(self.font)
         self.lexer.setFont(self.font)

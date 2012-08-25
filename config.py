@@ -14,17 +14,23 @@ class Config:
     
     def writeSetting(self,section,value):
         self.data["Setting"][section] = value
+        self.write()
     
     def workSpace(self):
         return self.readSetting("workspace")
+    
     def fontSize(self):
         return int(self.readSetting('fontsize'))
+    def setFontSize(self,val):
+        self.writeSetting('fontsize',val)
+    
     def fontName(self):
         return self.readSetting('fontname')
+    def setFontName(self,val):
+        self.writeSetting('fontname',val)
+        
     def iconSize(self):
         return int(self.readSetting('iconsize'))
-    def colorStyle(self):
-        return int(self.readSetting('colorstyle'))
     
     def projects(self):
         return self.read('Project')
@@ -43,20 +49,24 @@ class Config:
     
     def adb(self):
         return self.read('ADB')
+    def setAdb(self,val):
+        self.data['ADB'][0] = val[0]
+        self.data['ADB'][1] = val[1]
+        self.data['ADB'][2] = val[2]
+        self.data['ADB'][3] = val[3]
+        self.write()
     
     def thresh(self):
         return self.readSetting('thresh')
-    
     def setThresh(self,val):
         self.writeSetting('thresh',val)
-        self.write()
-    
+        
+    def colorStyle(self):
+        return int(self.readSetting('colorstyle'))
     def styleIndex(self):
         return self.readSetting('styleindex')
-    
     def setstyleIndex(self,value):
         self.writeSetting("styleindex",value)
-        self.write()
     
     def write(self):
         try:

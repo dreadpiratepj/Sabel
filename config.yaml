@@ -1,14 +1,14 @@
 ADB:
-- adb -d push C:/CODE/main.nut /sdcard/
-- adb -d shell am start -a android.intent.action.MAIN -n com.emo_framework.examples/com.emo_framework.EmoActivity
-- adb -d logcat -s EmoFramework
+- C:/CODE/main.nut /sdcard/
+- com.emo_framework.examples/com.emo_framework.EmoActivity
+- EmoFramework
 - adb -d shell ps | grep com.emo_framework.examples | awk '{print $2}' | xargs adb
   shell kill
 ANT:
 - android update project --target 5 --path .
 - ant debug install
 File:
-- C:/CODE/assets/common.nut
+- C:/CODE/assets/creditscene.nut
 - C:/CODE/assets/main.nut
 Project:
 - C:/CODE/data/

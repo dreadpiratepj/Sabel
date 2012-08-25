@@ -1,5 +1,6 @@
 from PyQt4 import QtGui 
-from PyQt4 import QtCore 
+from PyQt4 import QtCore
+from globals import adblist,config 
 """    
 class UIProject(QDialog):
     def __init__(self, parentWindow):
@@ -80,7 +81,21 @@ class DialogAndroid(QtGui.QDialog):
         self.label_4.setText("Logcat:")
         self.label_5.setText("Exit Activity:")
         self.tabWidget.setTabText(0,"Android")
+        self.buttonBox.clicked.connect(self.ok)
+        self.lineEdit_2.setText(adblist[0])
+        self.lineEdit_3.setText(adblist[1])
+        self.lineEdit_4.setText(adblist[2])
+        self.lineEdit_5.setText(adblist[3])
         
+    def ok(self,btn):
+        val = []
+        if(btn.text() == "OK"):
+            val.append(str(self.lineEdit_2.text()))
+            val.append(str(self.lineEdit_3.text()))
+            val.append(str(self.lineEdit_4.text()))
+            val.append(str(self.lineEdit_5.text()))
+            config.setAdb(val)
+        self.close()
 class DialogAnt(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)

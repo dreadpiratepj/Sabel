@@ -5,9 +5,7 @@ from PyQt4.QtCore import SIGNAL, Qt, QPoint, QMimeData, QByteArray
 
 from PyQt4 import QtGui
 from PyQt4 import QtCore
-
-import os
-import os.path as osp
+#from globals import ossep
 
 class MyTabBar(QTabBar):
     """Tabs base class with drag and drop support"""

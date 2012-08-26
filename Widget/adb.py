@@ -21,21 +21,16 @@ class WorkThread(QThread):
         self.process.kill()
         
     def run(self):
-        #self.process_thread.run()
         self.process.start(self.cmd)
         self.exec_()
         self.process.waitForFinished(-1)
         self.process.kill()
-        #self.emit(SIGNAL("finished"))
-        #self.setCmd(adblist[1])
-        #self.process.kill()
-        #self.process.start(self.cmd)
-        #self.process.waitForFinished()
         
-        #self.emit(SIGNAL("fini"))
-        #self.process.finished.connect(self.fini)
-        #self.emit(SIGNAL("finished"),True)
-        #return
+    def run2(self):
+        self.process.start(self.cmd)
+        self.exec_()
+        self.process.waitForFinished(-1)
+        self.process.kill()
         
     def fini(self,no):
         self.emit(SIGNAL("fini"),no,self.cmd)
@@ -140,12 +135,12 @@ class Adb(QWidget):
             self.parent.textEdit.append("Finshed")
             self.adb_thread.setCmd("adb -d shell am start -a android.intent.action.MAIN -n "+adblist[1])
             self.adb_thread.run()
-        elif(cmd == "adb -d push "+adblist[0]):
+        elif(cmd == "adb -d shell am start -a android.intent.action.MAIN -n "+adblist[1]):
             self.parent.textEdit.append(str(no))
             self.parent.textEdit.append(cmd)
             self.parent.textEdit.append("Finshed")
             self.adb_thread.setCmd("adb -d logcat -s "+adblist[2])
-            self.adb_thread.run()
+            self.adb_thread.run2()
         #self.adb_thread.kill_process()
         #self.parent.textEdit.append("Starting Activity...\n")
         #self.adb_thread.setCmd(adblist[1])
@@ -153,8 +148,6 @@ class Adb(QWidget):
         
     def run(self):
         if self.isRunning == False:
-            #if self.adb_process != None and self.adb_process.poll() == None:
-            #    self.adb_process.kill()
             self.isRunning = True
             self.parent.action_Run.setDisabled(True)
             self.parent.action_Stop.setEnabled(True)        
@@ -187,6 +180,9 @@ class Adb(QWidget):
     def stop(self):
         if self.isRunning == True:
             self.isRunning = False
+            if(self.adb_thread.process.Running):
+                self.adb_thread.process.terminate()
+                #self.adb_thread.process.kill()
             self.adb_thread.setCmd(adblist[3])
             self.adb_thread.run()
             self.adb_thread.kill_process()

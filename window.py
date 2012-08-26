@@ -7,11 +7,8 @@ from Widget import Tab,Tree,DialogAndroid
 from Widget.style import Styles
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
-                     OS_NAME,PY_VERSION,__version__,os_icon,os_icon_png,config,workSpace,
-                     iconSize,iconDir,styleIndex,adblist)
-
-
-
+                     OS_NAME,PY_VERSION,__version__,config,workSpace,
+                     iconSize,iconDir,styleIndex,adblist,Icons,os_icon)
 
 class Window(QMainWindow):
     def __init__(self,parent = None):
@@ -19,7 +16,7 @@ class Window(QMainWindow):
         self.setObjectName("self")
         self.resize(758, 673)
         self.setWindowTitle("Sabel")
-        self.setWindowIcon(os_icon_png("sabel-icon1"))
+        self.setWindowIcon(Icons.sabel)
         self.centralwidget = QWidget(self)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayout = QHBoxLayout(self.centralwidget)
@@ -29,7 +26,7 @@ class Window(QMainWindow):
         #TabWidgets
         self.tab_1 = QWidget(self)
         self.tab_1.setObjectName("tab_1")
-        self.tab_1.setMinimumWidth(500)
+        self.tab_1.setMinimumWidth(800)
         self.tabWidget = Tab(self.tab_1)
         self.tabWidget.setObjectName("tabWidget")
         self.VericalLayout = QVBoxLayout(self.tab_1)
@@ -38,7 +35,7 @@ class Window(QMainWindow):
         self.VericalLayout.addWidget(self.tabWidget)
         
         self.tabWidget_2 = QTabWidget(self)
-        self.tabWidget_2.setMaximumWidth(200)
+        #self.tabWidget_2.setMaximumWidth(200)
         self.tabWidget_2.setObjectName("tabWidget_2")
         self.tabWidget_3 = QTabWidget(self)
         self.tabWidget_3.setMaximumHeight(200)
@@ -48,18 +45,20 @@ class Window(QMainWindow):
         #Tree
         self.tab_5 = QWidget()
         self.tab_5.setObjectName("tab_5")
-        self.tab_5.setMaximumWidth(200)
+        #self.tab_5.setMaximumWidth(200)
         self.VerticalLayout_2 = QVBoxLayout(self.tab_5)#QHBoxLayout(self.tab_5)
         self.VerticalLayout_2.setMargin(0)
         self.VerticalLayout_2.setObjectName("horizontalLayout_3")
         self.treeWidget = Tree(self.tab_5)
         self.treeWidget.setObjectName("treeWidget")
+        self.treeWidget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.treeWidget.horizontalScrollBar().show()
         self.treebar = QToolBar()
-        action_Folder = QAction(os_icon('newfolder_wiz'),'New Folder', self)
+        action_Folder = QAction(Icons.newfolder,'New Folder', self)
         action_Folder.triggered.connect(self.about)
-        action_Android = QAction(os_icon_png('android1'),'Android', self)
+        action_Android = QAction(Icons.android,'Android', self)
         action_Android.triggered.connect(self.android)
-        action_Ant = QAction(os_icon('ant_view'),'Ant', self)
+        action_Ant = QAction(Icons.ant_view,'Ant', self)
         action_Ant.triggered.connect(self.ant)
         self.treebar.addAction(action_Folder)
         self.treebar.addAction(action_Android)
@@ -71,7 +70,7 @@ class Window(QMainWindow):
         #Outline
         self.tab_2 = QWidget()
         self.tab_2.setObjectName("tab_2")
-        self.tab_2.setMaximumWidth(200)
+        #self.tab_2.setMaximumWidth(200)
         self.VerticalLayout_3 = QVBoxLayout(self.tab_2)
         self.VerticalLayout_3.setMargin(0)
         self.VerticalLayout_3.setObjectName("VerticalLayout_3")
@@ -110,7 +109,7 @@ class Window(QMainWindow):
         self.lineEdit_2 = QLineEdit(self.tab_8)
         self.lineEdit_2.setObjectName("lineEdit_2")
         self.findClose = QPushButton(self.tab_8)
-        self.findClose.setIcon(os_icon("close_view"))
+        self.findClose.setIcon(Icons.close_view)
         self.findClose.setFlat(True)
         self.findClose.clicked.connect(self.findBarShow)
         self.find = QPushButton(self.tab_8)
@@ -158,8 +157,8 @@ class Window(QMainWindow):
         self.tabWidget_2.addTab(self.tab_2,"Outline")
         self.tabWidget_3.addTab(self.tab_7,"Error")
         self.tabWidget_3.addTab(self.tab_6,"Output")
-        self.tabWidget_3.setTabIcon(0,os_icon("message_error"))
-        self.tabWidget_3.setTabIcon(1,os_icon("monitor_obj"))
+        self.tabWidget_3.setTabIcon(0,Icons.error)
+        self.tabWidget_3.setTabIcon(1,Icons.console_view)
         self.tabWidget.setTabsClosable(True)
         self.tabWidget.setTabShape(0)
         
@@ -180,33 +179,38 @@ class Window(QMainWindow):
         #Status
         self.statusbar = QStatusBar(self)
         self.statusbar.setObjectName("statusbar")
+        self.aboutButton = QPushButton(self)
+        self.aboutButton.setFlat(True)
+        self.aboutButton.setIcon(Icons.anchor)
+        self.aboutButton.clicked.connect(self.about)
         self.cmdButton = QPushButton(self)
         self.cmdButton.setFlat(True)
-        self.cmdButton.setIcon(os_icon('monitor_obj'))
+        self.cmdButton.setIcon(Icons.console_view)
         self.cmdButton.clicked.connect(self.cmd)
         self.cmdButton.setShortcut('Ctrl+O')
         self.findButton = QPushButton(self)
         self.findButton.setFlat(True)
-        self.findButton.setIcon(os_icon('find_obj'))
+        self.findButton.setIcon(Icons.find)
         self.findButton.setShortcut("Ctrl+F")
         self.findButton.clicked.connect(self.findBarShow)
-        self.aboutButton = QPushButton(self)
-        self.aboutButton.setFlat(True)
-        self.aboutButton.setIcon(os_icon('toc_anchor_obj'))
-        self.aboutButton.clicked.connect(self.about)
         self.zoominButton = QPushButton(self)
         self.zoominButton.setFlat(True)
-        self.zoominButton.setIcon(os_icon('zoomplus'))
+        self.zoominButton.setIcon(Icons.zoomplus)
         self.zoominButton.clicked.connect(self.zoomin)
         self.zoomoutButton = QPushButton(self)
         self.zoomoutButton.setFlat(True)
-        self.zoomoutButton.setIcon(os_icon('zoomminus'))
+        self.zoomoutButton.setIcon(Icons.zoomminus)
         self.zoomoutButton.clicked.connect(self.zoomout)
+        self.fontButton = QPushButton(self)
+        self.fontButton.setFlat(True)
+        #self.fontButton.setIcon(('Font'))
+        self.zoomoutButton.clicked.connect(self.setFont)
+        self.statusbar.addWidget(self.aboutButton)
         self.statusbar.addWidget(self.cmdButton)
         self.statusbar.addWidget(self.findButton)
-        self.statusbar.addWidget(self.aboutButton)
         self.statusbar.addWidget(self.zoominButton)
         self.statusbar.addWidget(self.zoomoutButton)
+        self.statusbar.addWidget(self.fontButton)
         #self.statusbar.setFixedHeight(18)
         
         #Init colorstyling
@@ -224,41 +228,40 @@ class Window(QMainWindow):
             self.tab_8.hide()
 
     def initToolBar(self):
-        self.action_NewProject = QAction(os_icon('newprj_wiz'), 'Project', self)
+        self.action_NewProject = QAction(Icons.newprj, 'Project', self)
         self.action_NewProject.setShortcut('Ctrl+P')
         self.action_NewProject.triggered.connect(self.newProject)
         self.action_NewProject.setToolTip("Create a New Project")
         self.action_NewProject.setStatusTip("Create a New Project")
 
-        self.action_Open = QAction(os_icon('__imp_obj'), 'Open', self)
+        self.action_Open = QAction(Icons.open, 'Open', self)
         self.action_Open.setShortcut('Ctrl+O')
         self.action_Open.triggered.connect(self.fileOpen)
         self.action_Open.setToolTip("Open File")
         self.action_Open.setStatusTip("Open File")
 
-        self.action_Save = QAction(os_icon('save_edit'), 'Save', self)
+        self.action_Save = QAction(Icons.save, 'Save', self)
         self.action_Save.setShortcut('Ctrl+S')
         self.action_Save.triggered.connect(self.fileSave)
         self.action_Save.setToolTip("Save Current File")
-        self.action_Save.setStatusTip("Save Current File")
 
-        self.action_SaveAll = QAction(os_icon('saveall_edit'), 'SaveAll', self)
+        self.action_SaveAll = QAction(Icons.saveall, 'SaveAll', self)
         self.action_SaveAll.setShortcut('Ctrl+A')
         self.action_SaveAll.triggered.connect(self.fileSaveAll)
         self.action_SaveAll.setToolTip("Save All Files")
-        self.action_SaveAll.setStatusTip("Save All Files")
-        self.action_Help = QAction(os_icon('toc_open'), 'Help', self)
+        
+        self.action_Help = QAction(Icons.toc_open, 'Help', self)
         self.action_Help.triggered.connect(self.help)
-        self.action_Run = QAction(os_icon('lrun_obj'), 'Run', self)
+        self.action_Run = QAction(Icons.run, 'Run', self)
         self.action_Run.setShortcut('Ctrl+R')
         self.action_Run.triggered.connect(self.adb.run)
-        self.action_RunFile = QAction(os_icon('nav_go'), 'File', self)
-        self.action_Stop = QAction(os_icon('nav_stop'), 'Stop', self)
+        self.action_RunFile = QAction(Icons.go, 'File', self)
+        self.action_Stop = QAction(Icons.stop, 'Stop', self)
         self.action_Stop.setShortcut('Ctrl+Q')
         self.action_Stop.triggered.connect(self.adb.stop)
-        self.action_Design = QAction(os_icon('task_set'), 'Design', self)
+        self.action_Design = QAction(Icons.task_set, 'Design', self)
         #self.action_Design.triggered.connect(self.stop)
-        self.action_Todo = QAction(os_icon('task_set'), 'Todo', self)
+        self.action_Todo = QAction(Icons.task_set, 'Todo', self)
         #self.action_Todo.triggered.connect(self.stop)
         #Only variation CHeck Later
         
@@ -267,12 +270,12 @@ class Window(QMainWindow):
         men.addAction(QAction("Edit",self))
         men.addAction(QAction("Paste",self))
         men.addAction(QAction("Tabs",self))
-        self.action_Options = QAction(os_icon_png('emblem-system'), 'Options', self)
+        self.action_Options = QAction(Icons.thread_view, 'Options', self)
         self.action_Options.setMenu(men)
         self.action_Options.triggered.connect(self.options)
         
         
-        self.action_Full = QAction(os_icon('fullscreen'), 'Full', self)
+        self.action_Full = QAction(Icons.fullscreen, 'Full', self)
         self.action_Full.setShortcut('Shift+Enter')
         self.action_Full.triggered.connect(self.full)
 
@@ -280,7 +283,7 @@ class Window(QMainWindow):
         #chkBox.setText("MyCheckBox")
         #chkBoxAction=QWidgetAction(men)
         #chkBoxAction.setDefaultWidget(QPixmap(":/Icons/public_co"))
-        self.action_Style = QAction(os_icon('welcome16'), 'Style', self)
+        self.action_Style = QAction(Icons.style, 'Style', self)
         men1 = QMenu()
         self.styleslist = []
         self.style1 = QAction("All Hallow's Eve",self)
@@ -393,7 +396,6 @@ class Window(QMainWindow):
             
     def android(self):
         form = DialogAndroid(self)
-        #form.exec_()
         form.show()
     
     def ant(self):
@@ -430,6 +432,11 @@ class Window(QMainWindow):
         for i in range(len(self.files)):
             self.tabWidget.widget(i).zoomout()
             
+    def setFont(self):
+        pass
+        #for i in range(len(self.files)):
+            #self.tabWidget.widget(i).setFontName()
+            
     def initColorStyle(self):
         self.colorStyle = Styles[self.styleIndex]                
         pal = QPalette(self.tabWidget_2.palette())
@@ -449,6 +456,8 @@ class Window(QMainWindow):
             else:
                 i.setChecked(False)
         config.setstyleIndex(self.styleIndex)
-        self.initColorStyle()
+        #self.initColorStyle()
         for i in range(len(self.files)):
-            self.tabWidget.widget(i).setColorStyle(self.colorStyle)
+            pass
+            #self.tabWidget.
+            #self.tabWidget.widget(i).setColorStyle(self.colorStyle)

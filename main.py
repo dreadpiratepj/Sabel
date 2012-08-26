@@ -10,9 +10,8 @@ import icons
 from window import Window
 from Widget import Editor,PyInterp,Adb,Parser
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
-                     OS_NAME,os_icon,config,workSpace,
-                     iconSize,iconDir,ospathexists,os_pixmap,os_pixmap_png) 
-
+                     OS_NAME,config,workSpace,
+                     iconSize,iconDir,ospathexists,os_icon,app,Pix)
 
 class MainWindow(Window):
     def __init__(self, parent = None):
@@ -263,17 +262,13 @@ class MainWindow(Window):
             
     def options(self):
         pass
-        
 
-if __name__ == "__main__":
-    app = QApplication([])
-    splash_pix = os_pixmap_png('logosabel')
-    splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
-    splash.setMask(splash_pix.mask())
-    splash.show()
-    app.processEvents()
-    # Simulate something that takes time
-    frame = MainWindow()
-    frame.showMaximized()
-    splash.finish(frame)
-    app.exec_()
+splash_pix = Pix.logosabel
+splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
+splash.setMask(splash_pix.mask())
+splash.show()
+app.processEvents()
+frame = MainWindow()
+frame.showMaximized()
+splash.finish(frame)
+app.exec_()

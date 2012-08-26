@@ -3,7 +3,7 @@ from PyQt4.QtGui import (QTreeWidgetItem,QTreeWidget,QMessageBox,
 from PyQt4.QtCore import SIGNAL,Qt,QMimeData,QUrl,QPoint
 from globals import (oslistdir,ospathisdir,ospathsep,ospathjoin,ospathexists,
                      ospathbasename,os_icon,osremove,osrename,ospathdirname,
-                     recycle,ospathnormpath,oswalk)
+                     recycle,ospathnormpath,oswalk,Icons)
 
 
 class Dir(QTreeWidgetItem):
@@ -11,7 +11,7 @@ class Dir(QTreeWidgetItem):
         QTreeWidgetItem.__init__(self,parent)
         self.path = ospathjoin(path,name)
         self.setText (0, name)
-        self.setIcon(0,os_icon("package_obj"))
+        self.setIcon(0,Icons.package)
     
     def getPath(self):
         return self.path
@@ -36,13 +36,13 @@ class File(QTreeWidgetItem):
         self.Doc(name)
         self.Pic(name)
         if not (self.doc and self.pic):
-            self.setIcon(0,os_icon("file_obj"))
+            self.setIcon(0,Icons.file_obj)
         
         
     def Doc(self,name):
         for e in self.ext:
             if name.endswith(e):
-                self.setIcon(0,os_icon("file_obj"))
+                self.setIcon(0,Icons.file_obj)
                 self.doc = True
         #if(name.endswith(".txt") or name.endswith(".nut") or name.endswith(".py")):
         #    self.setIcon(0,os_icon("file_obj"))
@@ -50,7 +50,7 @@ class File(QTreeWidgetItem):
             
     def Pic(self,name):
         if(name.endswith(".png") or name.endswith(".gif") or name.endswith(".jpg")):
-            self.setIcon(0,os_icon("file_obj"))
+            self.setIcon(0,Icons.file_obj)
             self.pic = True
         
     def getPath(self):
@@ -73,9 +73,9 @@ class Project(QTreeWidgetItem):
         self.path = ospathjoin(startDir)
         self.closed = closed
         if(self.closed):
-            self.setIcon(0,os_icon('cprj_obj'))
+            self.setIcon(0,Icons.cprj)
         else:
-            self.setIcon(0,os_icon('prj_obj'))
+            self.setIcon(0,Icons.prj)
         self.setText (0, ospathbasename(ospathnormpath(startDir))) # set the text of the first 0
         self.setToolTip(0,startDir)
         self.Count += 1
@@ -203,28 +203,28 @@ class Tree(QTreeWidget):
 
         item = self.itemAt(pos)
         menu = QMenu(self)
-        action_Folder = QAction(os_icon('newfolder_wiz'),'New Folder', self)
+        action_Folder = QAction(Icons.newfolder,'New Folder', self)
         action_Folder.triggered.connect(lambda:self.newFolder(item))
-        action_File = QAction(os_icon('new_untitled_text_file'),'New File', self)
+        action_File = QAction(Icons.new_file,'New File', self)
         action_File.triggered.connect(lambda:self.newFile(item))
         action_Open = QAction('Open', self)
         action_Open.triggered.connect(lambda:self.openProject(item))
         action_Close = QAction('Close', self)
         action_Close.triggered.connect(lambda:self.closeProject(item))
         
-        action_OpenFile = QAction(os_icon('__imp_obj'),'Open', self)
+        action_OpenFile = QAction(Icons.open,'Open', self)
         action_OpenFile.triggered.connect(lambda:self.openFile(item))
-        action_RunFile = QAction(os_icon('nav_go'),'Python Run', self)
+        action_RunFile = QAction(Icons.go,'Python Run', self)
         action_RunFile.triggered.connect(lambda:self.runFile(item))
-        action_CopyFile = QAction(os_icon('file_obj'),'Copy', self)
+        action_CopyFile = QAction(Icons.file_obj,'Copy', self)
         action_CopyFile.triggered.connect(lambda:self.copyFile(item))
-        action_CopyDir = QAction(os_icon('file_obj'),'Copy', self)
+        action_CopyDir = QAction(Icons.file_obj,'Copy', self)
         action_CopyDir.triggered.connect(lambda:self.copyDir(item))
-        action_PasteFile = QAction(os_icon('paste_edit'),'Paste', self)
+        action_PasteFile = QAction(Icons.paste_edit,'Paste', self)
         action_PasteFile.triggered.connect(lambda:self.pasteFile(item))
-        action_PasteDir = QAction(os_icon('paste_edit'),'Paste', self)
+        action_PasteDir = QAction(Icons.paste_edit,'Paste', self)
         action_PasteDir.triggered.connect(lambda:self.pasteDir(item))
-        action_RefreshProject = QAction(os_icon('refresh_tab'),'Refresh', self)
+        action_RefreshProject = QAction(Icons.refresh_tab,'Refresh', self)
         action_RefreshProject.triggered.connect(lambda:self.refreshProject(item))
         action_RemoveProject = QAction('Remove', self)
         action_RemoveProject.triggered.connect(lambda:self.removeProject(item))
@@ -234,11 +234,11 @@ class Tree(QTreeWidget):
         action_RenameDir.triggered.connect(lambda:self.renameDir(item))
         action_RenameFile = QAction('Rename...', self)
         action_RenameFile.triggered.connect(lambda:self.renameFile(item))
-        action_DeleteFile = QAction(os_icon('trash'),'Delete', self)
+        action_DeleteFile = QAction(Icons.trash,'Delete', self)
         action_DeleteFile.triggered.connect(lambda:self.deleteFile(item))
-        action_DeleteDir = QAction(os_icon('trash'),'Delete', self)
+        action_DeleteDir = QAction(Icons.trash,'Delete', self)
         action_DeleteDir.triggered.connect(lambda:self.deleteDir(item))
-        action_DeleteProject = QAction(os_icon('trash'),'Delete', self)
+        action_DeleteProject = QAction(Icons.trash,'Delete', self)
         action_DeleteProject.triggered.connect(lambda:self.deleteProject(item))
         if(item.isProject()):
             if not(item.isClosed()):

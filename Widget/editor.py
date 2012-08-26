@@ -6,6 +6,7 @@ from lexersquirrel import LexerSquirrel
         
 class Editor(QsciScintilla):
     ARROW_MARKER_NUM = 8
+    #fontSize = fontSize
     def __init__(self,parent,text,lang,colorStyle):
         QsciScintilla.__init__(self,parent)
         self.parent = parent
@@ -93,6 +94,11 @@ class Editor(QsciScintilla):
         #self.setFont(self.font)
         self.lexer.setFont(self.font)
         self.setMarginsFont(self.font)
+        
+    def setFontName(self,name):
+        config.setFontName(name)
+        self.font.setFamily(name)
+        self.lexer.setFont(self.font)
         
             
             

@@ -10,7 +10,6 @@ ANT:
 File:
 - C:/CODE/assets/creditscene.nut
 - C:/CODE/assets/main.nut
-- C:/CODE/assets/logoscene.nut
 Project:
 - C:/CODE/data/
 - C:/CODE/assets/
@@ -18,7 +17,7 @@ Recent:
 - C:\CODE\main.nut
 Setting:
   fontname: Courier New
-  fontsize: 10
+  fontsize: 9
   iconsize: 16
   styleindex: 8
   thresh: 1

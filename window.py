@@ -1,7 +1,7 @@
 from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QHBoxLayout,QVBoxLayout,QTabWidget,QToolBar,QTextEdit,
                          QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar,
-                         QMainWindow,QPalette,QColor)              
+                         QMainWindow,QPalette,QColor,QSlider,QFontDialog,QLabel)              
 from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR,QStringList
 from Widget import Tab,Tree,DialogAndroid
 from Widget.style import Styles
@@ -38,7 +38,7 @@ class Window(QMainWindow):
         #self.tabWidget_2.setMaximumWidth(200)
         self.tabWidget_2.setObjectName("tabWidget_2")
         self.tabWidget_3 = QTabWidget(self)
-        self.tabWidget_3.setMaximumHeight(200)
+        self.tabWidget_3.setMaximumHeight(260)
         self.tabWidget_3.setObjectName("tabWidget_3")
         
          
@@ -82,12 +82,18 @@ class Window(QMainWindow):
         self.tab_6 = QWidget()
         self.tab_6.setObjectName("tab_6")
         #GGGGGGGGGGGGGGGGGGGG AWESOME
-        self.horizontalLayout_2 = QHBoxLayout(self.tab_6)
+        self.horizontalLayout_2 = QVBoxLayout(self.tab_6)
         self.horizontalLayout_2.setMargin(0)
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.textEdit = QTextEdit(self.tab_6)
         self.textEdit.setObjectName("textEdit")
+        self.lineeEdit = QLineEdit(self.tab_6)
+        self.lineeEdit.setObjectName("lineeEdit")
+        self.label = QLabel(self.tab_6)
+        self.label.setText("Input:")
         self.horizontalLayout_2.addWidget(self.textEdit)
+        self.horizontalLayout_2.addWidget(self.label)
+        self.horizontalLayout_2.addWidget(self.lineeEdit)
         
         #Error
         self.tab_7 = QWidget()
@@ -203,8 +209,8 @@ class Window(QMainWindow):
         self.zoomoutButton.clicked.connect(self.zoomout)
         self.fontButton = QPushButton(self)
         self.fontButton.setFlat(True)
-        #self.fontButton.setIcon(('Font'))
-        self.zoomoutButton.clicked.connect(self.setFont)
+        self.fontButton.setIcon(Icons.font)
+        self.fontButton.clicked.connect(self.setFont)
         self.statusbar.addWidget(self.aboutButton)
         self.statusbar.addWidget(self.cmdButton)
         self.statusbar.addWidget(self.findButton)
@@ -219,6 +225,7 @@ class Window(QMainWindow):
         #Init
         self.setCentralWidget(self.centralwidget)
         self.setStatusBar(self.statusbar)
+        self.textEdit.setReadOnly(True)
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
         
     def findBarShow(self):
@@ -256,20 +263,31 @@ class Window(QMainWindow):
         self.action_Run.setShortcut('Ctrl+R')
         self.action_Run.triggered.connect(self.adb.run)
         self.action_RunFile = QAction(Icons.go, 'File', self)
+        self.action_RunFile.triggered.connect(self.command.setCmd)
+        self.lineeEdit.returnPressed.connect(self.command.setCmdLine)
         self.action_Stop = QAction(Icons.stop, 'Stop', self)
         self.action_Stop.setShortcut('Ctrl+Q')
         self.action_Stop.triggered.connect(self.adb.stop)
         self.action_Design = QAction(Icons.task_set, 'Design', self)
-        #self.action_Design.triggered.connect(self.stop)
         self.action_Todo = QAction(Icons.task_set, 'Todo', self)
         #self.action_Todo.triggered.connect(self.stop)
         #Only variation CHeck Later
-        
         men = QMenu()
+        chkBox = QSlider()
+        chkBox.setTickPosition(QSlider.TicksLeft)
+        chkBoxAction = QWidgetAction(men)
+        chkBoxAction.setDefaultWidget(chkBox)
         men.addAction(QAction("Ident",self))
         men.addAction(QAction("Edit",self))
         men.addAction(QAction("Paste",self))
         men.addAction(QAction("Tabs",self))
+        men.addSeparator()
+        men.addAction(QAction("Threshold",self))
+        men.addAction(chkBoxAction)
+        chkBox.setValue(1)
+        chkBox.setMinimum(0)
+        chkBox.setMaximum(5)
+        chkBox.setInvertedAppearance(True)
         self.action_Options = QAction(Icons.thread_view, 'Options', self)
         self.action_Options.setMenu(men)
         self.action_Options.triggered.connect(self.options)
@@ -279,10 +297,7 @@ class Window(QMainWindow):
         self.action_Full.setShortcut('Shift+Enter')
         self.action_Full.triggered.connect(self.full)
 
-        #chkBox =QCheckBox(men)
-        #chkBox.setText("MyCheckBox")
-        #chkBoxAction=QWidgetAction(men)
-        #chkBoxAction.setDefaultWidget(QPixmap(":/Icons/public_co"))
+        
         self.action_Style = QAction(Icons.style, 'Style', self)
         men1 = QMenu()
         self.styleslist = []
@@ -433,7 +448,7 @@ class Window(QMainWindow):
             self.tabWidget.widget(i).zoomout()
             
     def setFont(self):
-        pass
+        font = QFontDialog.getFont()
         #for i in range(len(self.files)):
             #self.tabWidget.widget(i).setFontName()
             

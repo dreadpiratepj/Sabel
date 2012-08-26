@@ -3,47 +3,7 @@ from PyQt4.QtGui import QWidget
 import threading
 from subprocess import PIPE,Popen,STDOUT
 from PyQt4.QtCore import pyqtSignal,SIGNAL,QThread,QProcess,QString,QTimer
-
-class WorkThread(QThread):
-    def __init__(self):
-        QThread.__init__(self)
-        self.process = QProcess()
-        self.cmd = None
-        self.process.readyReadStandardOutput.connect(self.readOutput)
-        self.process.readyReadStandardError.connect(self.readErrors)
-        self.process.finished.connect(self.fini)
-        
-        
-    def setCmd(self,val):
-        self.cmd = val
-        
-    def kill_process(self):
-        self.process.kill()
-        
-    def run(self):
-        self.process.start(self.cmd)
-        self.exec_()
-        self.process.waitForFinished(-1)
-        self.process.kill()
-        
-    def run2(self):
-        self.process.start(self.cmd)
-        self.exec_()
-        self.process.waitForFinished(-1)
-        self.process.kill()
-        
-    def fini(self,no):
-        self.emit(SIGNAL("fini"),no,self.cmd)
-        
-    def readOutput(self):
-        self.emit(SIGNAL("update"),QString(self.process.readAllStandardOutput()))
-        
-    def readErrors(self):
-        self.emit(SIGNAL("update"),QString(self.process.readAllStandardError()))
-    
-    def __del__(self):
-        self.wait()
-
+from workthread import WorkThread
 
 class AdbThread(threading.Thread,QWidget):
     def __init__(self):
@@ -130,9 +90,12 @@ class Adb(QWidget):
         
     def newstart(self,no,cmd):
         if(cmd == "adb -d push "+adblist[0]):
-            self.parent.textEdit.append(str(no))
-            self.parent.textEdit.append(cmd)
-            self.parent.textEdit.append("Finshed")
+            if(no == 0):
+                self.parent.textEdit.append("Finshed")
+                self.parent.textEdit.append(cmd)
+            else:
+                self.parent.textEdit.append("Error Canceled")
+                self.parent.textEdit.append(cmd) 
             self.adb_thread.setCmd("adb -d shell am start -a android.intent.action.MAIN -n "+adblist[1])
             self.adb_thread.run()
         elif(cmd == "adb -d shell am start -a android.intent.action.MAIN -n "+adblist[1]):
@@ -180,9 +143,6 @@ class Adb(QWidget):
     def stop(self):
         if self.isRunning == True:
             self.isRunning = False
-            if(self.adb_thread.process.Running):
-                self.adb_thread.process.terminate()
-                #self.adb_thread.process.kill()
             self.adb_thread.setCmd(adblist[3])
             self.adb_thread.run()
             self.adb_thread.kill_process()

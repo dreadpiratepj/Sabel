@@ -5,8 +5,11 @@ __version__ = "0.48"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
-__version__ = "0.50"
+__version__ = "0.51"
 
+#TODO:
+#Must learn to destroy editor completely because memory keeps increasing
+#when close tab occurs
 
 import os
 from platform import system,python_version

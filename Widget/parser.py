@@ -17,7 +17,7 @@ class Parser(QWidget):
         self.parent.textEdit_2.append(line)
         if(self.parent.tabWidget_3.isHidden()):
             self.parent.tabWidget_3.show()
-            self.parent.tabWidget_3.setCurrentIndex(0)
+        self.parent.tabWidget_3.setCurrentIndex(0)
         
     def output(self,pipe):
         while True:

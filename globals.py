@@ -1,11 +1,10 @@
 #!/usr/bin/env python
 __author__ = "pyros2097"
 __license__ = "GPLv3"
-__version__ = "0.48"
 __copyright__ = 'Copyright (c) 2012, pyros2097'
 __credits__ = ['pyros2097', 'eclipse']
 __email__ = 'pyros2097@gmail.com'
-__version__ = "0.51"
+__version__ = "0.52"
 
 #TODO:
 #Must learn to destroy editor completely because memory keeps increasing
@@ -36,24 +35,26 @@ osrename = os.rename
 ossep = os.sep
 OS_NAME = system()
 
+
 workDir = os.getcwd()
 apiDir = ospathjoin(workDir,"api")
 iconDir = ospathjoin("Icons")
 binDir = ospathjoin(workDir,"bin")
 sqcDir = ospathjoin(binDir,"sqc.exe")
 
-
 recycle = send2trash
 PY_VERSION = python_version()
 
+#Config data
 config = Config()
 workSpace = config.workSpace()
 fontSize = config.fontSize()
 fontName = config.fontName()
 iconSize = config.iconSize()
 styleIndex = config.styleIndex()
-thresHold = config.thresh()
+threshold = config.thresh()
 adblist = config.adb()
+device = config.device()
 
 def os_icon(name):
         return QIcon(":/{0}.png".format(ospathjoin(iconDir,name)))

@@ -1,4 +1,4 @@
-from globals import fontSize,fontName,ospathjoin,os_pixmap,apiDir,thresHold,config
+from globals import fontSize,fontName,ospathjoin,os_pixmap,apiDir,threshold,config
 from PyQt4.QtCore import SIGNAL,QString
 from PyQt4.QtGui import QFontMetrics, QFont, QPixmap, QColor ,QPalette
 from PyQt4.Qsci import QsciScintilla, QsciLexerPython ,QsciAPIs ,QsciLexerCPP
@@ -26,7 +26,7 @@ class Editor(QsciScintilla):
         # Brace matching: enable for a brace immediately before or after
         # the current position
         self.setBraceMatching(QsciScintilla.SloppyBraceMatch)
-        self.setAutoCompletionThreshold(thresHold)
+        self.setAutoCompletionThreshold(threshold)
         self.setAutoCompletionSource(QsciScintilla.AcsAPIs)
         #self.setFolding(QsciScintilla.BoxedTreeFoldStyle)
         #self.setAutoCompletionSource(QsciScintilla.AcsAll)
@@ -39,7 +39,7 @@ class Editor(QsciScintilla):
         self.setMarkerBackgroundColor(self.colorStyle.marker,self.ARROW_MARKER_NUM)
         self.font = QFont()
         self.font.setFamily(fontName)
-        self.font.setFixedPitch(True)
+        #self.font.setFixedPitch(True)
         self.font.setPointSize(self.fontSize)
         self.setFont(self.font)
         self.fontmetrics = QFontMetrics(self.font)
@@ -96,9 +96,11 @@ class Editor(QsciScintilla):
         self.setMarginsFont(self.font)
         
     def setFontName(self,name):
-        config.setFontName(name)
         self.font.setFamily(name)
         self.lexer.setFont(self.font)
+        
+    def setThreshold(self,val):
+        self.setAutoCompletionThreshold(val)
         
             
             

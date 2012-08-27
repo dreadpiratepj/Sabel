@@ -1,6 +1,6 @@
 from PyQt4 import QtGui 
 from PyQt4 import QtCore
-from globals import adblist,config 
+from globals import adblist,config,device
 """    
 class UIProject(QDialog):
     def __init__(self, parentWindow):
@@ -28,14 +28,22 @@ class DialogAndroid(QtGui.QDialog):
         self.horizontalLayoutWidget.setObjectName(("horizontalLayoutWidget"))
         self.horizontalLayout = QtGui.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setMargin(0)
+        
+        
+        
+        
         self.horizontalLayout.setObjectName(("horizontalLayout"))
         self.tabWidget = QtGui.QTabWidget(self.horizontalLayoutWidget)
         self.tabWidget.setObjectName(("tabWidget"))
         self.tab_4 = QtGui.QWidget()
         self.tab_4.setObjectName(("tab_4"))
+       
+        
         self.formLayoutWidget = QtGui.QWidget(self.tab_4)
         self.formLayoutWidget.setGeometry(QtCore.QRect(10, 10, 361, 311))
         self.formLayoutWidget.setObjectName(("formLayoutWidget"))
+         
+        
         self.formLayout = QtGui.QFormLayout(self.formLayoutWidget)
         self.formLayout.setMargin(0)
         self.formLayout.setObjectName(("formLayout"))
@@ -68,7 +76,17 @@ class DialogAndroid(QtGui.QDialog):
         self.lineEdit_5.setObjectName(("lineEdit_5"))
         self.formLayout.setWidget(8, QtGui.QFormLayout.SpanningRole, self.lineEdit_5)
         self.tabWidget.addTab(self.tab_4, (""))
+        
+        #radio buttons
+        self.radio1=QtGui.QRadioButton("Device", self.formLayoutWidget)
+        self.radio2=QtGui.QRadioButton("Emulator", self.formLayoutWidget)
+        self.radio1.clicked.connect(lambda:self.setDevice(1))
+        self.radio2.clicked.connect(lambda:self.setDevice(0))
+        self.formLayout.setWidget(9, QtGui.QFormLayout.SpanningRole,self.radio1)
+        self.formLayout.setWidget(10, QtGui.QFormLayout.SpanningRole,self.radio2)
+        self.radio1.setChecked(1)
         self.horizontalLayout.addWidget(self.tabWidget)
+        
         self.buttonBox = QtGui.QDialogButtonBox(self)
         self.buttonBox.setGeometry(QtCore.QRect(40, 370, 341, 32))
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
@@ -87,6 +105,7 @@ class DialogAndroid(QtGui.QDialog):
         self.lineEdit_4.setText(adblist[2])
         self.lineEdit_5.setText(adblist[3])
         
+        
     def ok(self,btn):
         val = []
         if(btn.text() == "OK"):
@@ -96,6 +115,10 @@ class DialogAndroid(QtGui.QDialog):
             val.append(str(self.lineEdit_5.text()))
             config.setAdb(val)
         self.close()
+        
+    def setDevice(self,val):
+        config.setDevice(val)
+        
 class DialogAnt(QtGui.QDialog):
     def __init__(self, parent=None):
         QtGui.QDialog.__init__(self, parent)

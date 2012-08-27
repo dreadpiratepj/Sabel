@@ -1,14 +1,16 @@
 from PyQt4.QtGui import (QAction,QIcon,QMessageBox,QWidgetAction,QMenu,QWidget,
                          QHBoxLayout,QVBoxLayout,QTabWidget,QToolBar,QTextEdit,
                          QLineEdit,QPushButton,QToolButton,QSplitter,QStatusBar,
-                         QMainWindow,QPalette,QColor,QSlider,QFontDialog,QLabel)              
+                         QMainWindow,QPalette,QColor,QSlider,QFontDialog,QLabel,
+                         QFont)              
 from PyQt4.QtCore import QSize,Qt, QT_VERSION_STR,PYQT_VERSION_STR,QStringList
 from Widget import Tab,Tree,DialogAndroid
 from Widget.style import Styles
 
 from globals import (ospathsep,ospathjoin,ospathbasename,workDir,
                      OS_NAME,PY_VERSION,__version__,config,workSpace,
-                     iconSize,iconDir,styleIndex,adblist,Icons,os_icon)
+                     iconSize,iconDir,styleIndex,adblist,Icons,os_icon,threshold,
+                     fontName,fontSize)
 
 class Window(QMainWindow):
     def __init__(self,parent = None):
@@ -226,6 +228,7 @@ class Window(QMainWindow):
         self.setCentralWidget(self.centralwidget)
         self.setStatusBar(self.statusbar)
         self.textEdit.setReadOnly(True)
+        self.fontName = fontName
         #QtGui.QApplication.setStyle(QtGui.QStyleFactory.create('Cleanlooks'))
         
     def findBarShow(self):
@@ -273,21 +276,25 @@ class Window(QMainWindow):
         #self.action_Todo.triggered.connect(self.stop)
         #Only variation CHeck Later
         men = QMenu()
-        chkBox = QSlider()
-        chkBox.setTickPosition(QSlider.TicksLeft)
-        chkBoxAction = QWidgetAction(men)
-        chkBoxAction.setDefaultWidget(chkBox)
+        self.threshSlider = QSlider()
+        self.threshSlider.setTickPosition(QSlider.TicksLeft)
+        self.threshSlider.setOrientation(Qt.Horizontal)
+        self.threshSlider.setValue(threshold)
+        self.threshSlider.setMinimum(0)
+        self.threshSlider.setMaximum(5)
+        self.threshSlider.valueChanged.connect(self.setThreshold)
+        #self.threshSlider.setInvertedAppearance(True)
+        self.threshSliderAction = QWidgetAction(men)
+        self.threshSliderAction.setDefaultWidget(self.threshSlider)
+        
         men.addAction(QAction("Ident",self))
         men.addAction(QAction("Edit",self))
         men.addAction(QAction("Paste",self))
         men.addAction(QAction("Tabs",self))
         men.addSeparator()
         men.addAction(QAction("Threshold",self))
-        men.addAction(chkBoxAction)
-        chkBox.setValue(1)
-        chkBox.setMinimum(0)
-        chkBox.setMaximum(5)
-        chkBox.setInvertedAppearance(True)
+        men.addAction(self.threshSliderAction)
+        
         self.action_Options = QAction(Icons.thread_view, 'Options', self)
         self.action_Options.setMenu(men)
         self.action_Options.triggered.connect(self.options)
@@ -448,9 +455,26 @@ class Window(QMainWindow):
             self.tabWidget.widget(i).zoomout()
             
     def setFont(self):
-        font = QFontDialog.getFont()
-        #for i in range(len(self.files)):
-            #self.tabWidget.widget(i).setFontName()
+        font = QFont()
+        font.setFamily(self.fontName)
+        fdialog = QFontDialog(self)
+        fdialog.show()
+        fdialog.setCurrentFont(font)
+        fdialog.accepted.connect(lambda:self.setFontName(fdialog.currentFont()))
+        
+        
+    def setFontName(self,font):
+        #print "accepted"
+        #print font.family()
+        self.fontName = str(font.family())
+        config.setFontName(self.fontName)
+        for i in range(len(self.files)):
+            self.tabWidget.widget(i).setFontName(self.fontName)
+            
+    def setThreshold(self,val):
+        config.setThresh(val)
+        for i in range(len(self.files)):
+            self.tabWidget.widget(i).setThreshold(val)
             
     def initColorStyle(self):
         self.colorStyle = Styles[self.styleIndex]                

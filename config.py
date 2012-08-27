@@ -32,6 +32,16 @@ class Config:
     def iconSize(self):
         return int(self.readSetting('iconsize'))
     
+    def device(self):
+        return int(self.readSetting('device'))
+    def setDevice(self,value):
+        self.writeSetting("device",value)
+        
+    def thresh(self):
+        return self.readSetting('thresh')
+    def setThresh(self,val):
+        self.writeSetting('thresh',val)
+    
     def projects(self):
         return self.read('Project')
     
@@ -56,11 +66,6 @@ class Config:
         self.data['ADB'][3] = val[3]
         self.write()
     
-    def thresh(self):
-        return self.readSetting('thresh')
-    def setThresh(self,val):
-        self.writeSetting('thresh',val)
-        
     def colorStyle(self):
         return int(self.readSetting('colorstyle'))
     def styleIndex(self):

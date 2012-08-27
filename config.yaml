@@ -16,8 +16,9 @@ Project:
 Recent:
 - C:\CODE\main.nut
 Setting:
+  device: 1
   fontname: Courier New
-  fontsize: 9
+  fontsize: 11
   iconsize: 16
   styleindex: 8
   thresh: 1
